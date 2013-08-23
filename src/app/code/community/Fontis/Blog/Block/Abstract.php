@@ -23,6 +23,9 @@ abstract class Fontis_Blog_Block_Abstract extends Mage_Core_Block_Template
 {
     protected $_blogHelper = null;
 
+    /**
+     * @return Fontis_Blog_Helper_Data
+     */
     protected function getBlogHelper()
     {
         if (!$this->_blogHelper) {

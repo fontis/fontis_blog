@@ -85,7 +85,7 @@ class Fontis_Blog_Block_Post extends Mage_Core_Block_Template
             $post->setCreatedTime($this->formatTime($post->getCreatedTime(), $dateFormat, true));
             $post->setUpdateTime($this->formatTime($post->getUpdateTime(), $dateFormat, true));
 
-            $cats = Mage::getModel('blog/cat')->getCollection()->addPostFilter($post->getPostId());
+            $cats = Mage::getModel("blog/cat")->getCollection()->addPostFilter($post->getPostId());
             $catUrls = array();
             foreach ($cats as $cat) {
                 $catUrls[$cat->getTitle()] = $helper->getCatUrl($cat);
@@ -110,11 +110,11 @@ class Fontis_Blog_Block_Post extends Mage_Core_Block_Template
     public function getComment()
     {
         $post = $this->getPost();
-        
+
         $collection = Mage::getModel("blog/comment")->getCollection()
             ->addPostFilter($post->getPostId())
             ->setOrder("created_time", "asc")
-            ->addApproveFilter(2)
+            ->addApproveFilter(2) // I haven't yet decided the appropriate place for comment status constants
             ->load();
 
         return $collection;
@@ -123,6 +123,9 @@ class Fontis_Blog_Block_Post extends Mage_Core_Block_Template
     /**
      * This algorithm relies on the fact that comments are in the database
      * in numerical order. Don't go mucking with them!
+     *
+     * @param array $comments
+     * @return array
      */
     public function commentsThread($comments)
     {
@@ -207,6 +210,9 @@ class Fontis_Blog_Block_Post extends Mage_Core_Block_Template
         return null;
     }
 
+    /**
+     * @return bool
+     */
     public function isGravatarEnabled()
     {
         if (Mage::getStoreConfig("fontis_blog/comments/grav_enabled")) {
@@ -216,6 +222,9 @@ class Fontis_Blog_Block_Post extends Mage_Core_Block_Template
         }
     }
 
+    /**
+     * @return int
+     */
     public function getGravatarSize()
     {
         $size = Mage::getStoreConfig("fontis_blog/comments/grav_size");
@@ -229,6 +238,10 @@ class Fontis_Blog_Block_Post extends Mage_Core_Block_Template
         return $size;
     }
 
+    /**
+     * @param string $emailAddress
+     * @return null|string
+     */
     public function getGravatarUrl($emailAddress)
     {
         if (!$this->isGravatarEnabled()) {

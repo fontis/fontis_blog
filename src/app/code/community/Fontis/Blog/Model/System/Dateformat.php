@@ -19,33 +19,33 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Fontis_Blog_Model_Dateformat
+class Fontis_Blog_Model_System_Dateformat
 {
     protected $_options;
-    const FORMAT_TYPE_FULL      = 'full';
-    const FORMAT_TYPE_LONG      = 'long';
-    const FORMAT_TYPE_MEDIUM    = 'medium';
-    const FORMAT_TYPE_SHORT     = 'short';
+    const FORMAT_TYPE_FULL      = "full";
+    const FORMAT_TYPE_LONG      = "long";
+    const FORMAT_TYPE_MEDIUM    = "medium";
+    const FORMAT_TYPE_SHORT     = "short";
 
     public function toOptionArray()
     {
         if (!$this->_options) {
             $blogHelper = Mage::helper("blog");
             $this->_options[] = array(
-                'value' => self::FORMAT_TYPE_FULL,
-                'label' => $blogHelper->__('Full')
+                "value" => self::FORMAT_TYPE_FULL,
+                "label" => $blogHelper->__("Full")
             );
             $this->_options[] = array(
-                'value' => self::FORMAT_TYPE_LONG,
-                'label' => $blogHelper->__('Long')
+                "value" => self::FORMAT_TYPE_LONG,
+                "label" => $blogHelper->__("Long")
             );
             $this->_options[] = array(
-                'value' => self::FORMAT_TYPE_MEDIUM,
-                'label' => $blogHelper->__('Medium')
+                "value" => self::FORMAT_TYPE_MEDIUM,
+                "label" => $blogHelper->__("Medium")
             );
             $this->_options[] = array(
-                'value' => self::FORMAT_TYPE_SHORT,
-                'label' => $blogHelper->__('Short')
+                "value" => self::FORMAT_TYPE_SHORT,
+                "label" => $blogHelper->__("Short")
             );
         }
         return $this->_options;

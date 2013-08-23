@@ -19,7 +19,7 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Fontis_Blog_Model_Layouts
+class Fontis_Blog_Model_System_Layouts
 {
     protected $_options;
     
@@ -27,10 +27,10 @@ class Fontis_Blog_Model_Layouts
     {
         if (!$this->_options) {
             $layouts = array();
-            foreach (Mage::getConfig()->getNode('global/page/layouts')->children() as $layoutConfig) {
+            foreach (Mage::getConfig()->getNode("global/page/layouts")->children() as $layoutConfig) {
                 $this->_options[] = array(
-                   'value' => (string) $layoutConfig->template,
-                   'label' => (string) $layoutConfig->label
+                   "value" => (string) $layoutConfig->template,
+                   "label" => (string) $layoutConfig->label
                 );
             }
         }

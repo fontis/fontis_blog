@@ -23,6 +23,7 @@ Features
 * Links to bookmark services
 * Full multi-store support
 * Adds blog posts and categories to the Magento sitemap.xml generator
+* Integration with the Magento EE Full Page Cache (or other caches which implement a similar interface)
 
 Install instructions
 --------------------

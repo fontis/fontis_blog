@@ -1,0 +1,21 @@
+src/app/code/community/Fontis/Blog                                 app/code/community/Fontis/Blog
+
+src/app/design/adminhtml/default/default/layout/fontis/blog.xml    app/design/adminhtml/default/default/layout/fontis/blog.xml
+src/app/design/adminhtml/default/default/template/fontis/blog      app/design/adminhtml/default/default/template/fontis/blog
+src/app/design/frontend/base/default/layout/fontis/blog.xml        app/design/frontend/base/default/layout/fontis/blog.xml
+src/app/design/frontend/base/default/template/fontis/blog          app/design/frontend/base/default/template/fontis/blog
+
+src/app/etc/modules/Fontis_Blog.xml                                app/etc/modules/Fontis_Blog.xml
+
+src/app/locale/cs_CZ/Fontis_Blog.csv                               app/locale/cs_CZ/Fontis_Blog.csv
+src/app/locale/de_DE/Fontis_Blog.csv                               app/locale/de_DE/Fontis_Blog.csv
+src/app/locale/en_GB/Fontis_Blog.csv                               app/locale/en_GB/Fontis_Blog.csv
+src/app/locale/en_US/Fontis_Blog.csv                               app/locale/en_US/Fontis_Blog.csv
+src/app/locale/fr_FR/Fontis_Blog.csv                               app/locale/fr_FR/Fontis_Blog.csv
+src/app/locale/cs_CZ/template/email/comment_submitted.html         app/locale/cs_CZ/template/email/comment_submitted.html
+src/app/locale/de_DE/template/email/comment_submitted.html         app/locale/de_DE/template/email/comment_submitted.html
+src/app/locale/en_GB/template/email/comment_submitted.html         app/locale/en_GB/template/email/comment_submitted.html
+src/app/locale/en_US/template/email/comment_submitted.html         app/locale/en_US/template/email/comment_submitted.html
+src/app/locale/fr_FR/template/email/comment_submitted.html         app/locale/fr_FR/template/email/comment_submitted.html
+
+src/skin/frontend/base/default/fontis/blog                         skin/frontend/base/default/fontis/blog

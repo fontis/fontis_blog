@@ -116,8 +116,8 @@ class Fontis_Blog_Block_Manage_Blog_Edit_Tab_Form extends Mage_Adminhtml_Block_W
         $isGlobalWysiwygEnabled = $wysiwyg->isEnabled();
         $wysiwygConfig = array(
             "add_variables" => false,
-            "add_widgets"   => false,
-            "add_images"    => false,
+            "add_widgets"   => true,
+            "add_images"    => true,
         );
 
         $summaryWysiwygState = Mage::getStoreConfig("fontis_blog/blog/wysiwyg_summary");
@@ -151,6 +151,7 @@ class Fontis_Blog_Block_Manage_Blog_Edit_Tab_Form extends Mage_Adminhtml_Block_W
         } elseif (Mage::registry("blog_data")) {
             $form->setValues(Mage::registry("blog_data")->getData());
         }
+
         return parent::_prepareForm();
     }
 

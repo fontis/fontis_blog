@@ -77,6 +77,9 @@ class Fontis_Blog_Block_Post extends Mage_Core_Block_Template
             } else {
                 $post = Mage::getSingleton("blog/post");
             }
+
+            $post->setPostContent(Mage::helper("cms")->getPageTemplateProcessor()->filter($post->getPostContent()));
+
             $helper = Mage::helper("blog");
 
             $post->setAddress($helper->getPostUrl($post));

@@ -24,7 +24,7 @@
 <config>
     <modules>
         <Fontis_Blog>
-            <version>1.1.1</version>
+            <version>1.1.2</version>
         </Fontis_Blog>
     </modules>
     <admin>

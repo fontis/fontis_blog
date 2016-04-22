@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,88 +15,117 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Fontis_Blog_ArchiveController extends Mage_Core_Controller_Front_Action
+class Fontis_Blog_ArchiveController extends Fontis_Blog_Controller_Abstract_Frontend
 {
-    public function indexAction()
+    public function listAction()
     {
-        if (!Mage::helper("blog")->isArchivesEnabled()) {
-            $this->_forward("NoRoute");
-            return;
-        }
-
-        return $this->renderPage(Mage::helper("blog")->__("Archives"));
+        $this->renderPage(Mage::helper("blog")->__("Archives"), "blog-archive-list");
     }
 
     public function viewAction()
     {
-        if (!Mage::helper("blog")->isArchivesEnabled()) {
-            $this->_forward('NoRoute');
-            return;
-        }
+        $dateParts = Mage::registry("current_blog_archive_date");
 
-        $request = $this->getRequest();
-        $date = $request->getParam("date");
-        // strip off any query string parameters, and any trailing slashes
-        $date = explode("?", $date);
-        if (empty($date[0])) {
-            $this->_forward('NoRoute');
-            return;
-        }
-
-        $date = rtrim($date[0], "/");
-        $dateParams = explode("/", $date);
-        if (count($dateParams) == 0) {
-            $this->_forward('Index');
-            return;
-        } elseif (count($dateParams) > 3) {
-            // Stops the user from putting random strings on the end of the URL
-            $this->_forward('NoRoute');
-            return;
-        }
-
-        $archiveType = Fontis_Blog_Model_System_Archivetype::YEARLY;
-        $year = $dateParams[0];
-        if (isset($dateParams[1])) {
-            $month = $dateParams[1];
-            $archiveType = Fontis_Blog_Model_System_Archivetype::MONTHLY;
+        $archiveType = Fontis_Blog_Model_System_ArchiveType::YEARLY;
+        $year = $dateParts[0];
+        if (isset($dateParts[1])) {
+            $month = $dateParts[1];
+            $archiveType = Fontis_Blog_Model_System_ArchiveType::MONTHLY;
         } else {
             $month = 1;
         }
-        if (isset($dateParams[2])) {
-            $day = $dateParams[2];
-            $archiveType = Fontis_Blog_Model_System_Archivetype::DAILY;
+        if (isset($dateParts[2])) {
+            $day = $dateParts[2];
+            $archiveType = Fontis_Blog_Model_System_ArchiveType::DAILY;
         } else {
             $day = 1;
         }
 
         if (!checkdate($month, $day, $year)) {
-            $this->_forward("NoRoute");
+            $this->_forward("noroute");
             return;
         }
 
-        $request->setParam("type", $archiveType);
-        $request->setParam("date", $dateParams);
+        Mage::register("current_blog_archive_type", $archiveType);
 
-        $archiveLabel = Mage::helper("blog")->__("Archives");
-        $dateString = Fontis_Blog_Model_System_Archivetype::getTypeFormat($archiveType);
-        return $this->renderPage($archiveLabel . " - " . date($dateString, mktime(0, 0, 0, $month, $day, $year)));
+        $archiveLabel = $this->__("Archives");
+        $dateString = Fontis_Blog_Model_System_ArchiveType::getTypeFormat($archiveType);
+        $this->renderPage($archiveLabel . " - " . date($dateString, mktime(0, 0, 0, $month, $day, $year)), "blog-archive-view");
     }
 
-    protected function renderPage($pageTitle)
+    /**
+     * @param string $pageTitle
+     * @param array|string $layoutHandle
+     * @return Fontis_Blog_ArchiveController
+     */
+    protected function renderPage($pageTitle, $layoutHandle)
     {
-        $this->loadLayout();
-        $blogTitle = Mage::getStoreConfig('fontis_blog/blog/title');
-        if ($head = $this->getLayout()->getBlock("head")) {
+        $layout = $this->prepareLayout($layoutHandle);
+        $blog = $this->getBlog();
+
+        $blogTitle = $blog->getTitle();
+        if ($head = $layout->getBlock("head")) {
+            /** @var $head Mage_Page_Block_Html_Head */
             $head->setTitle($blogTitle . " - " . $pageTitle);
+            // These settings currently don't exist.
+            //$head->setKeywords(Mage::getStoreConfig("fontis_blog/blog/keywords"));
+            //$head->setDescription(Mage::getStoreConfig("fontis_blog/blog/description"));
         }
-        if ($root = $this->getLayout()->getBlock("root")) {
-            $root->setTemplate(Mage::getStoreConfig("fontis_blog/blog/layout"));
+        return $this->renderLayout();
+    }
+
+    /**
+     * @param bool $linkifyBlogCrumb
+     * @return array
+     */
+    protected function getBreadcrumbs($linkifyBlogCrumb = true)
+    {
+        $breadcrumbs = parent::getBreadcrumbs(true);
+        $blog = $this->getBlog();
+        /** @var $helper Fontis_Blog_Helper_Data */
+        $helper = Mage::helper("blog");
+
+        if ($dateParts = Mage::registry("current_blog_archive_date")) {
+            $archiveLink = $blog->getBlogUrl($helper->getBlogArchiveRoute());
+        } else {
+            $archiveLink = null;
         }
-        $this->renderLayout();
-        return true;
+
+        $breadcrumbs["archive"] = array(
+            "label" => $helper->__("Archives"),
+            "title" => $helper->__("Archives"),
+            "link"  => $archiveLink,
+        );
+
+        if (isset($dateParts[0])) {
+            $archiveLink = (isset($dateParts[1]) ? $archiveLink . "/" . $dateParts[0] : null);
+            $breadcrumbs["year"] = array(
+                "label" => $dateParts[0],
+                "title" => $dateParts[0],
+                "link"  => $archiveLink,
+            );
+
+            if (isset($dateParts[1])) {
+                $archiveLink = (isset($dateParts[2]) ? $archiveLink . "/" . $dateParts[1] : null);
+                $breadcrumbs["month"] = array(
+                    "label" => $dateParts[1],
+                    "title" => $dateParts[1],
+                    "link"  => $archiveLink,
+                );
+
+                if (isset($dateParts[2])) {
+                    $breadcrumbs["day"] = array(
+                        "label" => $dateParts[2],
+                        "title" => $dateParts[2],
+                    );
+                }
+            }
+        }
+
+        return $breadcrumbs;
     }
 }

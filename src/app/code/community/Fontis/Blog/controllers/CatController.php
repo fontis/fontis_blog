@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,28 +15,44 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Fontis_Blog_CatController extends Mage_Core_Controller_Front_Action
+class Fontis_Blog_CatController extends Fontis_Blog_Controller_Abstract_Frontend
 {
     public function viewAction()
     {
-        $identifier = $this->getRequest()->getParam("identifier", $this->getRequest()->getParam("id", false));
-        if (!Mage::helper("blog/cat")->renderPage($this, $identifier)) {
-            $this->_forward("NoRoute");
+        $layout = $this->prepareLayout("blog-cat-view");
+        $blog = $this->getBlog();
+        /** @var $cat Fontis_Blog_Model_Cat */
+        $cat = Mage::registry("current_blog_category");
+
+        if ($head = $layout->getBlock("head")) {
+            /** @var $head Mage_Page_Block_Html_Head */
+            $head->setTitle($blog->getTitle() . " - " . $cat->getTitle());
+            $head->setKeywords($cat->getMetaKeywords());
+            $head->setDescription($cat->getMetaDescription());
+            if ($blog->getSetting("rss/enabled")) {
+                $head->addItem("rss", $cat->getCatUrl() . "/rss");
+            }
         }
+
+        $this->renderLayout();
     }
 
-    public function noRouteAction($coreRoute = null)
+    /**
+     * @param bool $linkifyBlogCrumb
+     * @return array
+     */
+    protected function getBreadcrumbs($linkifyBlogCrumb = true)
     {
-        $this->getResponse()->setHeader('HTTP/1.1','404 Not Found');
-        $this->getResponse()->setHeader('Status','404 File not found');
-
-        $pageId = Mage::getStoreConfig('web/default/cms_no_route');
-        if (!Mage::helper('cms/page')->renderPage($this, $pageId)) {
-            $this->_forward('defaultNoRoute');
-        }
+        $breadcrumbs = parent::getBreadcrumbs(true);
+        $cat = Mage::registry("current_blog_category");
+        $breadcrumbs["cat"] = array(
+            "label" => $cat->getTitle(),
+            "title" => $cat->getTitle(),
+        );
+        return $breadcrumbs;
     }
 }

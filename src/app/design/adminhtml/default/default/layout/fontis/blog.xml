@@ -8,7 +8,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -16,31 +16,183 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 
 <layout version="0.1.0">
     <adminhtml_blog_blog_index>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Manage Blogs</title></action>
+        </reference>
         <reference name="content">
-            <block type="blog/manage_blog" name="blog" template="fontis/blog/posts.phtml" />
+            <block type="blog/manage_blog" name="blog" template="fontis/blog/grid.phtml" />
         </reference>
     </adminhtml_blog_blog_index>
-    <adminhtml_blog_blog_new>
-        <update handle="editor"/>
-    </adminhtml_blog_blog_new>
-    <adminhtml_blog_blog_edit>
-        <update handle="editor"/>
-    </adminhtml_blog_blog_edit>
-    <adminhtml_blog_comment_index>
+
+    <adminhtml-blog-blog-edit>
+        <reference name="head">
+            <action method="setCanLoadExtJs"><value>1</value></action>
+        </reference>
         <reference name="content">
-            <block type="blog/manage_comment" name="comment" />
+            <block type="blog/manage_blog_edit" name="blog_edit" template="widget/form/container.phtml" />
+        </reference>
+        <reference name="left">
+            <block type="blog/manage_blog_edit_tabs" name="blog_edit_tabs" template="widget/tabs.phtml">
+                <block type="blog/manage_blog_edit_tab_main" name="blog_edit_tab_main" template="widget/form.phtml">
+                    <action method="setTabTitle" module="blog" translate="title"><title>Main</title></action>
+                    <action method="setTabLabel" module="blog" translate="label"><label>Main</label></action>
+                </block>
+                <action method="addTab">
+                    <id>main_section</id>
+                    <name>blog_edit_tab_main</name>
+                </action>
+
+                <block type="blog/manage_blog_edit_tab_settings" name="blog_edit_tab_settings" template="widget/form.phtml">
+                    <action method="setTabTitle" module="blog" translate="title"><title>Settings</title></action>
+                    <action method="setTabLabel" module="blog" translate="label"><label>Settings</label></action>
+
+                    <block type="core/text_list" name="blog_edit_tab_settings_after" as="form_after" />
+                </block>
+                <action method="addTab">
+                    <id>settings_section</id>
+                    <name>blog_edit_tab_settings</name>
+                </action>
+            </block>
+        </reference>
+    </adminhtml-blog-blog-edit>
+    <adminhtml_blog_blog_edit>
+        <update handle="adminhtml-blog-blog-edit" />
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Edit Blog</title></action>
+        </reference>
+    </adminhtml_blog_blog_edit>
+    <adminhtml_blog_blog_new>
+        <update handle="adminhtml-blog-blog-edit" />
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>New Blog</title></action>
+        </reference>
+    </adminhtml_blog_blog_new>
+
+    <adminhtml_blog_post_index>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Manage Posts</title></action>
+        </reference>
+        <reference name="content">
+            <block type="blog/manage_post" name="post" template="fontis/blog/grid.phtml" />
+        </reference>
+    </adminhtml_blog_post_index>
+
+    <adminhtml-blog-post-edit>
+        <update handle="editor" />
+        <reference name="head">
+            <action method="setCanLoadTinyMce"><flag>1</flag></action>
+        </reference>
+        <reference name="content">
+            <block type="blog/manage_post_edit" name="post_edit" template="widget/form/container.phtml" />
+        </reference>
+        <reference name="left">
+            <block type="blog/manage_post_edit_tabs" name="post_edit_tabs" template="widget/tabs.phtml" />
+        </reference>
+    </adminhtml-blog-post-edit>
+    <adminhtml_blog_post_edit>
+        <update handle="adminhtml-blog-post-edit" />
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Edit Post</title></action>
+        </reference>
+    </adminhtml_blog_post_edit>
+    <adminhtml_blog_post_new>
+        <update handle="adminhtml-blog-post-edit" />
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>New Post</title></action>
+        </reference>
+    </adminhtml_blog_post_new>
+
+    <adminhtml_blog_comment_index>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Manage Comments</title></action>
+        </reference>
+        <reference name="content">
+            <block type="blog/manage_comment" name="comment" template="fontis/blog/grid/comment.phtml" />
         </reference>
     </adminhtml_blog_comment_index>
-    <adminhtml_blog_cat_index>
+
+    <adminhtml_blog_comment_edit>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Edit Comment</title></action>
+        </reference>
         <reference name="content">
-            <block type="blog/manage_cat" name="cat" template="fontis/blog/cats.phtml" />
+            <block type="blog/manage_comment_edit" name="comment_edit" template="widget/form/container.phtml" />
+        </reference>
+    </adminhtml_blog_comment_edit>
+
+    <adminhtml_blog_cat_index>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Manage Categories</title></action>
+        </reference>
+        <reference name="content">
+            <block type="blog/manage_cat" name="cat" template="fontis/blog/grid.phtml" />
         </reference>
     </adminhtml_blog_cat_index>
+
+    <adminhtml-blog-cat-edit>
+        <reference name="head">
+            <action method="setCanLoadExtJs"><value>1</value></action>
+        </reference>
+        <reference name="content">
+            <block type="blog/manage_cat_edit" name="cat_edit" template="widget/form/container.phtml" />
+        </reference>
+        <reference name="left">
+            <block type="blog/manage_cat_edit_tabs" name="cat_edit_tabs" template="widget/tabs.phtml">
+                <block type="blog/manage_cat_edit_tab_main" name="cat_edit_tab_main" template="widget/form.phtml">
+                    <action method="setTabTitle" module="blog" translate="title"><title>Main</title></action>
+                    <action method="setTabLabel" module="blog" translate="label"><label>Main</label></action>
+                </block>
+                <action method="addTab">
+                    <id>main_section</id>
+                    <name>cat_edit_tab_main</name>
+                </action>
+            </block>
+        </reference>
+    </adminhtml-blog-cat-edit>
+    <adminhtml_blog_cat_edit>
+        <update handle="adminhtml-blog-cat-edit" />
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Edit Category</title></action>
+        </reference>
+    </adminhtml_blog_cat_edit>
+    <adminhtml_blog_cat_new>
+        <update handle="adminhtml-blog-cat-edit" />
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>New Category</title></action>
+        </reference>
+    </adminhtml_blog_cat_new>
+
+    <adminhtml_blog_author_index>
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Manage Authors</title></action>
+        </reference>
+        <reference name="content">
+            <block type="blog/manage_author" name="author" template="fontis/blog/grid.phtml" />
+        </reference>
+    </adminhtml_blog_author_index>
+
+    <adminhtml-blog-author-edit>
+        <reference name="content">
+            <block type="blog/manage_author_edit" name="author_edit" template="widget/form/container.phtml" />
+        </reference>
+    </adminhtml-blog-author-edit>
+    <adminhtml_blog_author_edit>
+        <update handle="adminhtml-blog-author-edit" />
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>Edit Author</title></action>
+        </reference>
+    </adminhtml_blog_author_edit>
+    <adminhtml_blog_author_new>
+        <update handle="adminhtml-blog-author-edit" />
+        <reference name="head">
+            <action method="setTitle" translate="title"><title>New Author</title></action>
+        </reference>
+    </adminhtml_blog_author_new>
 </layout>

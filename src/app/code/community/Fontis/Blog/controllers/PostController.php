@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,150 +15,167 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Fontis_Blog_PostController extends Mage_Core_Controller_Front_Action
+class Fontis_Blog_PostController extends Fontis_Blog_Controller_Abstract_Frontend
 {
     public function viewAction()
     {
-        $request = $this->getRequest();
-        $identifier = $request->getParam("identifier", $request->getParam("id", false));
+        $post = $this->getPost();
 
-        if ($data = $request->getPost()) {
-            $blogHelper = Mage::helper("blog");
-            $customerSession = Mage::getSingleton("customer/session");
+        $layout = $this->prepareLayout("blog-post-view");
 
-            if (!Mage::getStoreConfig("fontis_blog/comments/enabled")) {
-                $customerSession->addError($blogHelper->__("Comments are not enabled."));
-                if (!Mage::helper("blog/post")->renderPage($this, $identifier)) {
-                    $this->_forward("NoRoute");
-                }
-                return;
-            }
-
-            $commentsLogin = Mage::getStoreConfig("fontis_blog/comments/login");
-            if (!$customerSession->isLoggedIn() && $commentsLogin) {
-                $customerSession->addError($blogHelper->__("You must be logged in to comment."));
-                if (!Mage::helper("blog/post")->renderPage($this, $identifier)) {
-                    $this->_forward("NoRoute");
-                }
-                return;
-            }
-
-            $entryErrors = array();
-            if (trim($data["comment"]) == "") {
-                $entryErrors[] = $blogHelper->__("No comment was entered.");
-            }
-            if (trim($data["user"]) == "") {
-                $entryErrors[] = $blogHelper->__("No name was entered.");
-            }
-            if (trim($data["email"]) == "") {
-                $entryErrors[] = $blogHelper->__("No email address was entered.");
-            }
-            if (count($entryErrors)) {
-                foreach ($entryErrors as $error) {
-                    $customerSession->addError($error);
-                }
-                if (!Mage::helper("blog/post")->renderPage($this, $identifier)) {
-                    $this->_forward("NoRoute");
-                }
-                return;
-            }
-            unset($entryErrors);
-
-            if (!$data["in_reply_to"]) {
-                $data["in_reply_to"] = null;
-            }
-
-            $model = Mage::getModel("blog/comment");
-            $model->setData($data);
-
-            try {
-                if (Mage::helper("blog")->useRecaptcha()) {
-                    $privatekey = Mage::getStoreConfig("fontis_recaptcha/setup/private_key");
-                    $resp = Mage::helper("fontis_recaptcha")->recaptcha_check_answer($privatekey,
-                        $_SERVER["REMOTE_ADDR"],
-                        $data["recaptcha_challenge_field"],
-                        $data["recaptcha_response_field"]
-                    );
-
-                    if ($resp == false) {
-                        $customerSession->addError($blogHelper->__("Your Recaptcha solution was incorrect. Please try again."));
-                        if (!Mage::helper("blog/comment")->renderPage($this, $identifier, $data)) {
-                            $this->_forward("NoRoute");
-                        }
-                        return;
-                    }
-                }
-
-                $model->setCreatedTime(now());
-                $model->setComment(htmlspecialchars($model->getComment(), ENT_QUOTES));
-                if (Mage::getStoreConfig("fontis_blog/comments/approval")) {
-                    $model->setStatus(2);
-                } else if ($customerSession->isLoggedIn() && Mage::getStoreConfig("fontis_blog/comments/loginauto")) {
-                    $model->setStatus(2);
-                } else {
-                    $model->setStatus(1);
-                }
-                $model->save();
-
-                if ($model->getStatus() == 1) {
-                    $customerSession->addSuccess($blogHelper->__("Your comment has been submitted and is awaiting approval."));
-                } else {
-                    $customerSession->addSuccess($blogHelper->__("Your comment has been submitted."));
-                }
-
-                $comment_id = $model->getCommentId();
-            } catch (Exception $e) {
-                $customerSession->addError($blogHelper->__("An error occurred. Please try again."));
-                if (!Mage::helper("blog/post")->renderPage($this, $identifier)) {
-                    $this->_forward("NoRoute");
-                }
-            }
-
-            if (Mage::getStoreConfig("fontis_blog/comments/recipient_email") != null && $model->getStatus() == 1 && isset($comment_id)) {
-                $translate = Mage::getSingleton("core/translate");
-                /* @var $translate Mage_Core_Model_Translate */
-                $translate->setTranslateInline(false);
-                try {
-                    $data["url"] = Mage::getUrl("blog/manage_comment/edit/id/" . $comment_id);
-                    $postObject = new Varien_Object();
-                    $postObject->setData($data);
-                    $mailTemplate = Mage::getModel("core/email_template");
-                    /* @var $mailTemplate Mage_Core_Model_Email_Template */
-                    $mailTemplate->setDesignConfig(array("area" => "frontend"))
-                        ->sendTransactional(
-                            Mage::getStoreConfig("fontis_blog/comments/email_template"),
-                            Mage::getStoreConfig("fontis_blog/comments/sender_email_identity"),
-                            Mage::getStoreConfig("fontis_blog/comments/recipient_email"),
-                            null,
-                            array("data" => $postObject)
-                        );
-                    $translate->setTranslateInline(true);
-                } catch (Exception $e) {
-                    $translate->setTranslateInline(true);
-                }
-            }
-            if (!Mage::helper("blog/post")->renderPage($this, $identifier)) {
-                $this->_forward("NoRoute");
-            }
-        } else {
-            if (!Mage::helper("blog/post")->renderPage($this, $identifier)) {
-                $this->_forward("NoRoute");
-            }
+        if ($head = $layout->getBlock("head")) {
+            /** @var $head Mage_Page_Block_Html_Head */
+            $head->setTitle($this->getBlog()->getPostPageTitle($post));
+            $head->setKeywords($post->getMetaKeywords());
+            $head->setDescription($post->getMetaDescription());
         }
+        $this->initLayoutMessages(array("customer/session"))->renderLayout();
     }
 
-    public function noRouteAction($coreRoute = null)
+    /**
+     * @return Fontis_Blog_Model_Post
+     */
+    protected function getPost()
     {
-        $this->getResponse()->setHeader("HTTP/1.1", "404 Not Found");
-        $this->getResponse()->setHeader("Status", "404 File not found");
+        return Mage::registry("current_blog_post");
+    }
 
-        $pageId = Mage::getStoreConfig("web/default/cms_no_route");
-        if (!Mage::helper("cms/page")->renderPage($this, $pageId)) {
-            $this->_forward("defaultNoRoute");
+    /**
+     * @param bool $linkifyBlogCrumb
+     * @return array
+     */
+    protected function getBreadcrumbs($linkifyBlogCrumb = true)
+    {
+        $breadcrumbs = parent::getBreadcrumbs($linkifyBlogCrumb);
+        $post = $this->getPost();
+        $breadcrumbs["blog_post"] = array(
+            "label" => $post->getTitle(),
+            "title" => $post->getTitle(),
+        );
+        return $breadcrumbs;
+    }
+
+    public function submitCommentAction()
+    {
+        $request = $this->getRequest();
+        /** @var $blogHelper Fontis_Blog_Helper_Data */
+        $blogHelper = Mage::helper("blog");
+        /** @var $customerSession Mage_Customer_Model_Session */
+        $customerSession = Mage::getSingleton("customer/session");
+
+        $blog = $this->getBlog();
+        $post = $this->getPost();
+        $postData = $request->getPost();
+
+        if ($post->canPostNewComments() === false) {
+            // We don't need to check whether or not comments are disabled here because the router does that for us.
+            if ($blog->getSettingFlag("comments/login") === true && !$customerSession->isLoggedIn()) {
+                $customerSession->addError($blogHelper->__("You must be logged in to comment."));
+                $this->_redirectReferer();
+                return;
+            } else {
+                // Catch-all in case something goes horribly wrong.
+                $this->_forward("noroute");
+                return;
+            }
+        }
+
+        if (!$request->isPost()) {
+            $customerSession->addError($blogHelper->__("No comment data found."));
+            $this->_redirectReferer();
+            return;
+        }
+
+        // Validate the data the user sent us. If they didn't get us proper information, let them know.
+        $commentData = Mage::helper("blog/comment")->validateCommentData($postData);
+        if (empty($commentData["comment"]) || empty($commentData["user"]) || empty($commentData["email"])) {
+            $customerSession->addError($blogHelper->__("Some comment data was missing or invalid. Please try again."));
+            $this->_redirectReferer();
+            return;
+        }
+        $commentData["post_id"] = $post->getId();
+
+        // Validate the user's reCAPTCHA solution.
+        try {
+            if (!$this->validateRecaptcha($postData)) {
+                $customerSession->addError($blogHelper->__("Your reCAPTCHA solution was incorrect. Please try again."));
+                $this->_redirectReferer();
+                return;
+            }
+        } catch (Exception $e) {
+            Mage::logException($e);
+            $customerSession->addError($blogHelper->__("Sorry, an unknown error occurred. Please try again."));
+            $this->_redirectReferer();
+            return;
+        }
+
+        // Prepare our comment model.
+        /** @var $comment Fontis_Blog_Model_Comment */
+        $comment = Mage::getModel("blog/comment")
+            ->setData($commentData)
+            ->setBlog($blog)
+            ->setBlogId($blog->getId())
+            ->setCustomerId($customerSession->getCustomer()->getId())
+            ->setCreatedTime(now());
+        if ($blog->getSetting("comments/approval")) {
+            $comment->setStatus(Fontis_Blog_Model_Comment::COMMENT_APPROVED);
+        } else if ($customerSession->isLoggedIn() && $blog->getSetting("comments/loginauto")) {
+            $comment->setStatus(Fontis_Blog_Model_Comment::COMMENT_APPROVED);
+        } else {
+            $comment->setStatus(Fontis_Blog_Model_Comment::COMMENT_UNAPPROVED);
+        }
+
+        try {
+            $comment->save();
+
+            if ($comment->getStatus() == Fontis_Blog_Model_Comment::COMMENT_UNAPPROVED) {
+                $customerSession->addSuccess($blogHelper->__("Your comment has been submitted and is awaiting approval."));
+            } else {
+                $customerSession->addSuccess($blogHelper->__("Your comment has been submitted."));
+            }
+        } catch (Exception $e) {
+            Mage::logException($e);
+            $customerSession->addError($blogHelper->__("Sorry, an error occurred while saving your comment. Please try again."));
+            $this->_redirectReferer();
+            return;
+        }
+
+        $comment->sendNewCommentNotificationEmail();
+
+        $this->_redirectReferer();
+    }
+
+    /**
+     * @param array $postData
+     * @return bool
+     */
+    protected function validateRecaptcha(array $postData)
+    {
+        if ($this->getBlog()->useRecaptcha()) {
+            if (!empty($postData["recaptcha_challenge_field"])) {
+                $challengeField = $postData["recaptcha_challenge_field"];
+            } else {
+                return false;
+            }
+            if (!empty($postData["recaptcha_response_field"])) {
+                $responseField = $postData["recaptcha_response_field"];
+            } else {
+                return false;
+            }
+            $privateKey = Mage::getStoreConfig("fontis_recaptcha/setup/private_key");
+            return Mage::helper("fontis_recaptcha")->recaptcha_check_answer(
+                $privateKey,
+                $_SERVER["REMOTE_ADDR"],
+                $challengeField,
+                $responseField
+            );
+        } else {
+            // If reCAPTCHA isn't available or enabled, always return true.
+            return true;
         }
     }
 }

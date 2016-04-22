@@ -8,7 +8,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -16,8 +16,8 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 
@@ -25,18 +25,18 @@
     <tabs>
         <fontis_extensions translate="label" module="blog">
             <label>Fontis Extensions</label>
-            <sort_order>2000000</sort_order>
+            <sort_order>1000000</sort_order>
         </fontis_extensions>
     </tabs>
     <sections>
         <fontis_blog translate="label" module="blog">
-            <label>Blog</label>
+            <label>Blog Defaults</label>
             <tab>fontis_extensions</tab>
             <frontend_type>text</frontend_type>
             <sort_order>100</sort_order>
             <show_in_default>1</show_in_default>
-            <show_in_website>1</show_in_website>
-            <show_in_store>1</show_in_store>
+            <show_in_website>0</show_in_website>
+            <show_in_store>0</show_in_store>
             <groups>
                 <blog translate="label">
                     <label>Blog Settings</label>
@@ -44,34 +44,35 @@
                     <sort_order>1</sort_order>
                     <expanded>1</expanded>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
-                        <title translate="label">
-                            <label>Blog Title</label>
-                            <frontend_type>text</frontend_type>
+                        <header_image translate="label">
+                            <label>Header Image</label>
+                            <comment>If an image is available, it will be used in place of the title above for the heading on the main blog page.</comment>
+                            <frontend_type>image</frontend_type>
                             <sort_order>1</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </title>
-                        <route translate="label">
-                            <label>Route to Blog</label>
-                            <comment>eg. "news" will make the blog accessible from domain.com/news. Must not contain any slashes. Leave blank for the default ("blog").</comment>
-                            <frontend_type>text</frontend_type>
+                            <show_in_default>0</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </header_image>
+                        <custom_theme translate="label">
+                            <label>Custom Theme</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>blog/system_themes</source_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </route>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </custom_theme>
                         <layout translate="label">
                             <label>Page Layout</label>
                             <frontend_type>select</frontend_type>
                             <source_model>blog/system_layouts</source_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </layout>
                         <dateformat translate="label">
                             <label>Date Format</label>
@@ -79,112 +80,120 @@
                             <source_model>blog/system_dateformat</source_model>
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </dateformat>
                         <blogcrumbs translate="label">
                             <label>Show Breadcrumbs</label>
+                            <comment>Depends on the theme you're using.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </blogcrumbs>
-                        <readmore translate="label">
-                            <label>Summary Character Count</label>
-                            <comment>Number of characters in a post to display before it is truncated (on the sentence boundary) and the Read More link added. 0 for unlimited.</comment>
-                            <frontend_type>text</frontend_type>
-                            <validate>validate-number</validate>
-                            <sort_order>6</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </readmore>
-                        <usesummary translate="label">
-                            <label>Use Post Summary</label>
-                            <comment>If turned on, the "post summary" field will be used if available instead of truncating the main content.</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>7</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </usesummary>
-                        <perpage translate="label">
-                            <label>Posts Per Page</label>
-                            <comment>The number posts displayed per page. 0 to disable pages.</comment>
-                            <frontend_type>text</frontend_type>
-                            <validate>validate-number</validate>
-                            <sort_order>8</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </perpage>
-                        <bookmarkspost translate="label">
-                            <label>Show Bookmarks in Posts</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>9</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </bookmarkspost>
-                        <bookmarkslist translate="label">
-                            <label>Show Bookmarks in Lists</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </bookmarkslist>
                         <wysiwyg_post translate="label">
                             <label>Use WYSIWYG editor for post editor</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>blog/system_wysiwygenabled</source_model>
-                            <sort_order>11</sort_order>
+                            <source_model>blog/system_wysiwygEnabled</source_model>
+                            <sort_order>6</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </wysiwyg_post>
                         <wysiwyg_summary translate="label">
                             <label>Use WYSIWYG editor for post summary editor</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>blog/system_wysiwygenabled</source_model>
-                            <sort_order>12</sort_order>
+                            <source_model>blog/system_wysiwygEnabled</source_model>
+                            <sort_order>7</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </wysiwyg_summary>
+                        <description translate="label">
+                            <label>Meta Description</label>
+                            <comment>Sets the meta description on the blog index page.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>8</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </wysiwyg_summary>
+                        </description>
                     </fields>
                 </blog>
-                <menu translate="label">
-                    <label>Menus and Links</label>
+                <routing>
+                    <label>Routing Settings</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>2</sort_order>
                     <expanded>1</expanded>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <cat translate="label">
+                            <label>Route for Categories</label>
+                            <comment>eg. "category" will make categories accessible from example.com/news/category/categoryname. Must not contain any slashes. Leave blank for the default ("cat").</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </cat>
+                        <tag translate="label">
+                            <label>Route for Tags</label>
+                            <comment>eg. "tag" will make tags accessible from example.com/news/tag/tagname. Must not contain any slashes. Leave blank for the default ("tag").</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </tag>
+                        <author translate="label">
+                            <label>Route for Authors</label>
+                            <comment>eg. "author" will make authors accessible from example.com/news/author/authorname. Must not contain any slashes. Leave blank for the default ("author").</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <enabled>
+                                    <fieldset>authors</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </author>
+                    </fields>
+                </routing>
+                <menu translate="label">
+                    <label>Menus and Links</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>3</sort_order>
+                    <expanded>1</expanded>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <left translate="label">
                             <label>Enable Left Menu</label>
+                            <comment>Depends on the theme and layout that you're using.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </left>
                         <right translate="label">
                             <label>Enable Right Menu</label>
+                            <comment>Depends on the theme and layout that you're using.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </right>
                         <recent translate="label">
                             <label>Recent Posts</label>
@@ -193,39 +202,149 @@
                             <validate>validate-number</validate>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </recent>
-                        <top translate="label">
-                            <label>Enable Top Link</label>
-                            <comment>This setting depends on the theme being used.</comment>
+                        <tags translate="label">
+                            <label>Show tags in menu</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </tags>
+                        <tag_label translate="label">
+                            <label>Tag label</label>
+                            <comment>Leave blank for the default ("Tags"). Only used on the frontend.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </tag_label>
+                        <top translate="label">
+                            <label>Enable Top Link</label>
+                            <comment>Depends on the theme you're using.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>6</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </top>
                         <footer translate="label">
                             <label>Enable Footer Link</label>
-                            <comment>This setting depends on the theme being used.</comment>
+                            <comment>Depends on the theme you're using.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>5</sort_order>
+                            <sort_order>7</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </footer>
+                        <primary translate="label">
+                            <label>Enable Main Navigation Link</label>
+                            <comment>Only supported in CE1.9/EE1.14 and above</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>8</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </primary>
+                        <link_label translate="label">
+                            <label>Link name</label>
+                            <comment>The label to use for the link placed into the top/footer/main navigation links. Leave blank to use the name of the blog.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>9</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </link_label>
                     </fields>
                 </menu>
+                <lists translate="label">
+                    <label>Lists</label>
+                    <comment>These settings only affect lists of posts (index, category, tag and archive pages).</comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>4</sort_order>
+                    <expanded>1</expanded>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <readmore translate="label">
+                            <label>Summary Character Count</label>
+                            <comment>Number of characters in a post to display before it is truncated (on the sentence boundary) and the Read More link added. 0 for unlimited.</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number</validate>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </readmore>
+                        <usesummary translate="label">
+                            <label>Use Post Summary</label>
+                            <comment>If turned on, the "post summary" field will be used if available instead of truncating the main content.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </usesummary>
+                        <perpage translate="label">
+                            <label>Posts Per Page</label>
+                            <comment>The number posts displayed per page. 0 to disable pages. Tag and archive lists do not currently have pagination.</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number</validate>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </perpage>
+                    </fields>
+                </lists>
+                <posts translate="label">
+                    <label>Posts</label>
+                    <comment>These settings only affect individual posts.</comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>5</sort_order>
+                    <expanded>1</expanded>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <title_format>
+                            <label>Page Title Format</label>
+                            <comment><![CDATA[Format for the text in the page's &lt;title&gt; tags. Available tags: [blog:title], [post:title].]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </title_format>
+                        <addthis_button_type>
+                            <label>AddThis Button Type</label>
+                            <comment>Show already-customised AddThis sharing buttons.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>blog/system_addThis_buttonType</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </addthis_button_type>
+                    </fields>
+                </posts>
                 <comments translate="label">
                     <label>Comments</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>3</sort_order>
+                    <sort_order>6</sort_order>
                     <expanded>1</expanded>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <enabled translate="label">
                             <label>Enable Comments</label>
@@ -233,8 +352,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </enabled>
                         <login translate="label">
                             <label>Login Required to Comment</label>
@@ -242,8 +361,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </login>
                         <approval translate="label">
                             <label>Auto Approve Comments</label>
@@ -252,8 +371,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </approval>
                         <loginauto translate="label">
                             <label>Logged in Auto Approve Comments</label>
@@ -262,16 +381,16 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </loginauto>
                         <recipient_email translate="label">
                             <label>Send Emails To</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </recipient_email>
                         <sender_email_identity translate="label">
                             <label>Email Sender</label>
@@ -279,8 +398,8 @@
                             <source_model>adminhtml/system_config_source_email_identity</source_model>
                             <sort_order>6</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </sender_email_identity>
                         <email_template translate="label">
                             <label>Email Template</label>
@@ -288,8 +407,8 @@
                             <source_model>adminhtml/system_config_source_email_template</source_model>
                             <sort_order>7</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </email_template>
                         <recaptcha translate="label">
                             <label>Enable ReCAPTCHA</label>
@@ -298,18 +417,18 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>8</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </recaptcha>
                         <grav_enabled translate="label">
                             <label>Enable Gravatar avatars</label>
-                            <comment><![CDATA[Commenters will have avatars from <a href="http://gravatar.com/" target="_blank">Gravatar</a> displayed next to their comment.]]></comment>
+                            <comment><![CDATA[Commenters will have avatars from <a href="https://gravatar.com/" target="_blank">Gravatar</a> displayed next to their comment.]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </grav_enabled>
                         <grav_size translate="label">
                             <label>Size of Gravatar avatars</label>
@@ -318,8 +437,8 @@
                             <validate>validate-number</validate>
                             <sort_order>11</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </grav_size>
                         <grav_default>
                             <label>Use default Gravatar image</label>
@@ -328,19 +447,19 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </grav_default>
                     </fields>
                 </comments>
                 <archives translate="label">
                     <label>Archives</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>4</sort_order>
+                    <sort_order>7</sort_order>
                     <expanded>1</expanded>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <enabled translate="label">
                             <label>Enable Archives</label>
@@ -348,17 +467,17 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </enabled>
                         <type translate="label">
                             <label>Archive Type</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>blog/system_archivetype</source_model>
+                            <source_model>blog/system_archiveType</source_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </type>
                         <limit translate="label">
                             <label>Limit</label>
@@ -367,17 +486,17 @@
                             <validate>validate-number</validate>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </limit>
                         <order translate="label">
                             <label>Sort Order</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>blog/system_sortorder</source_model>
+                            <source_model>blog/system_sortOrder</source_model>
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </order>
                         <showcount translate="label">
                             <label>Show Post Count</label>
@@ -385,19 +504,57 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </showcount>
                     </fields>
                 </archives>
+                <authors translate="label">
+                    <label>Authors</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>8</sort_order>
+                    <expanded>1</expanded>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label>Enable Author pages on frontend</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enabled>
+                        <label translate="label">
+                            <label>Label</label>
+                            <comment>Leave blank for the default ("Authors"). Only used on the frontend.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </label>
+                        <heading_format>
+                            <label>Page Heading Format</label>
+                            <comment><![CDATA[Format for the text in the page's heading. Available tags: [author:name]]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </heading_format>
+                    </fields>
+                </authors>
                 <rss translate="label">
                     <label>RSS Feed</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>5</sort_order>
+                    <sort_order>9</sort_order>
                     <expanded>1</expanded>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <enabled translate="label">
                             <label>Enable Blog RSS Feed</label>
@@ -406,110 +563,191 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </enabled>
+                        <visible translate="label">
+                            <label>Visibility</label>
+                            <comment><model>blog/system_scope</model></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>blog/system_scope</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </visible>
                         <title translate="label">
                             <label>RSS Feed Title</label>
                             <comment>Use a different tile for the RSS feed. Leave blank to use the main blog title.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>2</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <sort_order>3</sort_order>
+                            <show_in_default>0</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </title>
                         <image translate="label">
                             <label>RSS Feed Image</label>
                             <comment>Relative to current skin directory (eg. images/rsslogo.jpg).</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>3</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <sort_order>4</sort_order>
+                            <show_in_default>0</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </image>
                         <posts translate="label">
                             <label>RSS Posts to Show</label>
                             <comment>Number of posts to display in the feed. Leave empty for all posts.</comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number</validate>
-                            <sort_order>4</sort_order>
+                            <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </posts>
                         <usesummary translate="label">
                             <label>Use Post Summary</label>
                             <comment>Use the post summaries rather than the full post content in the feed.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>5</sort_order>
+                            <sort_order>6</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </usesummary>
+                        <showauthor translate="label">
+                            <label>Show Post Author</label>
+                            <comment>Include the author of each post in the feed.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>7</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </showauthor>
                     </fields>
                 </rss>
-            </groups>
-        </fontis_blog>
-        <sitemap translate="label" module="sitemap">
-            <label>Google Sitemap</label>
-            <tab>catalog</tab>
-            <frontend_type>text</frontend_type>
-            <sort_order>70</sort_order>
-            <show_in_default>1</show_in_default>
-            <show_in_website>1</show_in_website>
-            <show_in_store>1</show_in_store>
-            <groups>
-                <blog translate="label">
-                    <label>Blog Options</label>
+                <sitemap>
+                    <label>Google Sitemap</label>
+                    <comment>List settings are for list pages (index, category, tags). Post settings are specifically for post pages.</comment>
                     <frontend_type>text</frontend_type>
-                    <sort_order>4</sort_order>
+                    <sort_order>10</sort_order>
                     <expanded>1</expanded>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
-                        <changefreq_post translate="label">
-                            <label>Post Frequency</label>
+                        <changefreq_list translate="label">
+                            <label>List Frequency</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_frequency</source_model>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </changefreq_post>
-                        <priority_post translate="label">
-                            <label>Post Priority</label>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </changefreq_list>
+                        <priority_list translate="label">
+                            <label>List Priority</label>
+                            <comment>Valid values range from 0.0 to 1.0</comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>adminhtml/system_config_backend_sitemap</backend_model>
+                            <backend_model>blog/system_sitemap</backend_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment>Valid values range from 0.0 to 1.0</comment>
-                        </priority_post>
-                        <changefreq_cat translate="label">
-                            <label>Category Frequency</label>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </priority_list>
+                        <changefreq_post translate="label">
+                            <label>Post Frequency</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_frequency</source_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </changefreq_cat>
-                        <priority_cat translate="label">
-                            <label>Category Priority</label>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </changefreq_post>
+                        <priority_post translate="label">
+                            <label>Post Priority</label>
+                            <comment>Valid values range from 0.0 to 1.0</comment>
                             <frontend_type>text</frontend_type>
-                            <backend_model>adminhtml/system_config_backend_sitemap</backend_model>
+                            <backend_model>blog/system_sitemap</backend_model>
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment>Valid values range from 0.0 to 1.0</comment>
-                        </priority_cat>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </priority_post>
                     </fields>
-                </blog>
+                </sitemap>
+                <opengraph>
+                    <label>Opengraph</label>
+                    <comment>These settings affect how data is generated for Open Graph tags. You will need the Fontis Open Graph extension installed for these to appear.</comment>
+                    <sort_order>11</sort_order>
+                    <expanded>1</expanded>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <post_default_image translate="label">
+                            <label>Default Image for Posts</label>
+                            <comment>If Small Image is selected but no image is selected for that field for a post, it will fall back to the Image field.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>blog/system_postImageType</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </post_default_image>
+                    </fields>
+                </opengraph>
+                <search>
+                    <label>Search</label>
+                    <comment>These settings will need to be supported by your search engine to be functional.</comment>
+                    <sort_order>12</sort_order>
+                    <expanded>1</expanded>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <include_in_search translate="label">
+                            <label>Include in Search</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </include_in_search>
+                        <attributes_to_index>
+                            <label>Attributes to include in the index</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>blog/system_searchAttributes</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </attributes_to_index>
+                    </fields>
+                </search>
+                <advanced>
+                    <label>Advanced Settings</label>
+                    <comment>These settings should only be touched if you're very sure about what you're doing.</comment>
+                    <sort_order>13</sort_order>
+                    <expanded>1</expanded>
+                    <show_in_default>0</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <add_default_layout_handles translate="label">
+                            <label>Add Default Layout Handles</label>
+                            <comment>Turning this off means you will need to manually create the layout XML required to display content on the frontend.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>0</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </add_default_layout_handles>
+                    </fields>
+                </advanced>
             </groups>
-        </sitemap>
+        </fontis_blog>
     </sections>
 </config>

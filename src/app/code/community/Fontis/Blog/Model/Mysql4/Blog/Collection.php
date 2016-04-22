@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,86 +15,112 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Fontis_Blog_Model_Mysql4_Blog_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
 {
-    public function _construct()
+    /**
+     * @var string
+     */
+    protected $_eventPrefix = "fontis_blog_blog_collection";
+
+    /**
+     * @var string
+     */
+    protected $_eventObject = "collection";
+
+    protected function _construct()
     {
         $this->_init("blog/blog");
     }
 
-    public function addEnableFilter($status)
-    {
-        $this->getSelect()->where("status = ?", $status);
-        return $this;
-    }
-
-    public function addCatFilter($catId)
-    {
-        $this->getSelect()->join(
-            array("cat_table" => $this->getTable("post_cat")),
-            "main_table.post_id = cat_table.post_id",
-            array()
-        )
-        ->where("cat_table.cat_id = ?", $catId);
-
-        return $this;
-    }
-
-    protected function _afterLoad()
-    {
-        /*$items = $this->getColumnValues('post_id');
-        if (count($items)) {
-            $select = $this->getConnection()->select()
-                    ->from($this->getTable('store'))
-                    ->where($this->getTable('store').'.post_id IN (?)', $items);
-            if ($result = $this->getConnection()->fetchPairs($select)) {
-                foreach ($this as $item) {
-                    if (!isset($result[$item->getData('post_id')])) {
-                        continue;
-                    }
-                    if ($result[$item->getData('post_id')] == 0) {
-                        $storeCode = key(Mage::app()->getStores(false, true));
-                    } else {
-                        $storeCode = Mage::app()->getStore($result[$item->getData('post_id')])->getCode();
-                    }
-                    $item->setData('store_code', $storeCode);
-                }
-            }
-        }*/
-
-        if (count($this) > 0) {
-            Mage::dispatchEvent("fontis_blog_blog_collection_load_after", array("collection" => $this));
-        }
-
-        return parent::_afterLoad();
-    }
-
     /**
-     * Add Filter by store
-     *
-     * @param int|Mage_Core_Model_Store $store
-     * @return Mage_Cms_Model_Mysql4_Page_Collection
+     * @param Mage_Core_Model_Store|int|int[] $store
+     * @return Fontis_Blog_Model_Mysql4_Blog_Collection
      */
     public function addStoreFilter($store)
     {
-        if (!Mage::app()->isSingleStoreMode()) {
-            if ($store instanceof Mage_Core_Model_Store) {
-                $store = array($store->getId());
-            }
-
-            $this->getSelect()->join(
-                array("store_table" => $this->getTable("store")),
-                "main_table.post_id = store_table.post_id",
-                array()
-            )
-            ->where("store_table.store_id in (?)", array(0, $store));
-
+        if (Mage::app()->isSingleStoreMode()) {
             return $this;
         }
+
+        if ($store instanceof Mage_Core_Model_Store) {
+            $store = (int) $store->getId();
+        }
+        if (is_array($store)) {
+            $store[] = Mage_Core_Model_App::ADMIN_STORE_ID;
+        } else {
+            $store = array(
+                $store,
+                Mage_Core_Model_App::ADMIN_STORE_ID,
+            );
+        }
+
+        $this->getSelect()->join(
+            array("store_table" => $this->getTable("blog/store")),
+            "main_table.blog_id = store_table.blog_id",
+            array()
+        )
+        ->where("store_table.store_id IN (?)", $store);
+
         return $this;
+    }
+
+    /**
+     * @return Fontis_Blog_Model_Mysql4_Blog_Collection
+     */
+    public function addEnableFilter()
+    {
+        $enabledStatuses = Mage::getModel("blog/system_blogStatus")->getEnabledStatuses();
+        $this->getSelect()->where("status = ?", $enabledStatuses);
+        return $this;
+    }
+
+    /**
+     * @param bool $includeEmpty
+     * @param array $additional
+     * @return array
+     */
+    public function toDisplayOptionArray($includeEmpty = false, array $additional = array())
+    {
+        $res = array();
+        $values = array(
+            "value" => "id",
+            "label" => "label",
+        );
+        $values = array_merge($values, $additional);
+
+        if ($includeEmpty === true) {
+            $res[] = array("value" => "", "label" => "");
+        }
+
+        foreach ($this as $item) {
+            /** @var $item Fontis_Blog_Model_Blog */
+            $data = array();
+            foreach ($values as $code => $field) {
+                $data[$code] = $item->getDataUsingMethod($field);
+            }
+            $res[] = $data;
+        }
+        return $res;
+    }
+
+    /**
+     * @return Fontis_Blog_Model_Mysql4_Blog_Collection
+     */
+    protected function _afterLoad()
+    {
+        if (count($this) > 0) {
+            Mage::dispatchEvent("fontis_blog_blog_collection_load_after", array("collection" => $this));
+            /** @var $blogResourceModel Fontis_Blog_Model_Mysql4_Blog */
+            $blogResourceModel = Mage::getResourceModel("blog/blog");
+            foreach ($this as $blog) {
+                $blogResourceModel->afterLoad($blog);
+            }
+        }
+
+        return parent::_afterLoad();
     }
 }

@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,44 +15,63 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 ?>
+
 <?php
+/** @var $this Fontis_Blog_Block_Abstract */
 $posts = $this->getPosts();
-$_helper = Mage::helper("blog");
+$helper = Mage::helper("blog");
 ?>
 
-<?php foreach ($posts as $post): ?>
-    <div class="postWrapper">
-        <div class="postTitle">
-            <h2><a href="<?php echo $post->getAddress(); ?>"><?php echo $post->getTitle(); ?></a></h2>
-            <h3><?php echo $post->getCreatedTime(); ?></h3>
+<div class="page-title">
+    <h1><?php echo $this->getHeader(); ?></h1>
+</div>
+
+<?php if (count($posts)): ?>
+    <?php foreach ($posts as $post): ?>
+        <div class="postWrapper" itemscope itemtype="http://schema.org/NewsArticle">
+            <div class="postTitle">
+                <h2 itemprop="headline"><a href="<?php echo $post->getPostUrl(); ?>"><?php echo $post->getTitle(); ?></a></h2>
+                <h3><?php echo $post->getCreatedTime(); ?></h3>
+            </div>
+            <meta itemprop="datePublished" content="<?php echo $this->getMicrodataDatePublished($post); ?>"/>
+
+            <div class="postContent std" itemprop="description"><?php echo $post->getPostSummary(); ?></div>
+
+            <div class="postDetails">
+                <?php if ($this->getCommentsEnabled()): ?>
+                    <a href="<?php echo $post->getPostUrl(); ?>#commentBox"><?php echo $this->getCommentTotalString($post->getCommentCount()); ?></a> |
+                <?php endif; ?>
+
+                <?php $postCats = $post->getCategories(); ?>
+                <?php if ($postCats->getSize() == 0): ?>
+                    <?php echo $helper->__("Posted"); ?>
+                <?php else: ?>
+                    <?php echo $helper->__("Posted in"); ?>
+                    <?php foreach ($postCats as $cat): ?>
+                        <a href="<?php echo $cat->getCatUrl(); ?>"><?php echo $this->escapeHtml($cat->getTitle()); ?></a>
+                    <?php endforeach; ?>
+                <?php endif; ?> by
+                <?php if ($this->getBlog()->getSettingFlag("authors/enabled")): ?>
+                <a href="<?php echo $post->getAuthor()->getAuthorUrl(); ?>" rel="author"><?php echo $this->escapeHtml($post->getAuthor()->getName()); ?></a>
+                <?php else: ?>
+                <span itemprop="author"><?php echo $this->escapeHtml($post->getAuthor()->getName()); ?></span>
+                <?php endif; ?>
+
+                <?php $postTags = $post->getTags(); ?>
+                <?php if ($postTags->getSize() > 0): ?>
+                    | <?php echo $helper->__("Tagged in"); ?>
+                    <?php foreach ($postTags as $tag): ?>
+                        <a href="<?php echo $tag->getTagUrl(); ?>"><?php echo $this->escapeHtml($tag->getName()); ?></a>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
         </div>
-        <div class="postContent"><?php echo $post->getPostContent(); ?></div>
-        <?php echo $this->getBookmarkHtml($post); ?>
-        <div class="postDetails">
-            <?php if ($this->getCommentsEnabled()): ?>
-                <a href="<?php echo $post->getAddress(); ?>#commentBox">
-                <?php
-                    if (($commentCount = $post->getCommentCount()) == 1) {
-                        echo "1 " . $_helper->__("Comment");
-                    } else {
-                        echo "$commentCount " . $_helper->__("Comments");
-                    }
-                ?></a> |
-            <?php endif; ?>
-            <?php $postCats = $post->getCats(); ?>
-            <?php if (!empty($postCats)): ?>
-                <?php echo $_helper->__("Posted in"); ?>
-                <?php foreach ($postCats as $title => $url): ?>
-                    <a href="<?php echo $url; ?>"><?php echo $title; ?></a>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <?php echo $_helper->__("Posted"); ?>
-            <?php endif; ?> By <?php echo $post->getUser(); ?>
-        </div>
-    </div>
-<?php endforeach; ?>
-<?php $this->getPages(); ?>
+    <?php endforeach; ?>
+<?php else: ?>
+    <?php echo $helper->__("No posts were found."); ?>
+<?php endif ?>
+<?php echo $this->getChildHtml("blog_pager"); ?>

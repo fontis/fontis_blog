@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Fontis Blog Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * Parts of this software are derived from code originally developed by
+ * Robert Chambers <magento@robertchambers.co.uk>
+ * and released as "Lazzymonk's Blog" 0.5.8 in 2009.
+ *
+ * @category   Fontis
+ * @package    Fontis_Blog
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<config>
+    <menu>
+        <blog module="blog">
+            <title>Blog</title>
+            <!-- 71 should be just after "CMS" -->
+            <sort_order>71</sort_order>
+            <children>
+                <!-- Hopefully this link can be restored eventually -->
+                <!--newpost module="blog">
+                    <title>New Post</title>
+                    <sort_order>0</sort_order>
+                    <action>adminhtml/blog_post/new</action>
+                </newpost-->
+                <posts module="blog">
+                    <title>Manage Posts</title>
+                    <sort_order>0</sort_order>
+                    <action>adminhtml/blog_post/index</action>
+                </posts>
+                <comment module="blog">
+                    <title>Manage Comments</title>
+                    <sort_order>1</sort_order>
+                    <action>adminhtml/blog_comment/index</action>
+                </comment>
+                <cat module="blog">
+                    <title>Manage Categories</title>
+                    <sort_order>2</sort_order>
+                    <action>adminhtml/blog_cat/index</action>
+                </cat>
+                <blogs module="blog">
+                    <title>Manage Blogs</title>
+                    <sort_order>3</sort_order>
+                    <action>adminhtml/blog_blog/index</action>
+                </blogs>
+                <authors module="blog">
+                    <title>Manage Authors</title>
+                    <sort_order>4</sort_order>
+                    <action>adminhtml/blog_author/index</action>
+                </authors>
+                <settings module="blog">
+                    <title>Default Settings</title>
+                    <sort_order>5</sort_order>
+                    <action>adminhtml/system_config/edit/section/fontis_blog</action>
+                </settings>
+            </children>
+        </blog>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <blog>
+                        <title>Blog</title>
+                        <sort_order>71</sort_order>
+                        <children>
+                            <!-- Hopefully this link can be restored eventually -->
+                            <!--newpost>
+                                <title>New Post</title>
+                                <sort_order>0</sort_order>
+                            </newpost-->
+                            <posts>
+                                <title>Manage Posts</title>
+                                <sort_order>0</sort_order>
+                            </posts>
+                            <comment>
+                                <title>Manage Comments</title>
+                                <sort_order>1</sort_order>
+                            </comment>
+                            <cat>
+                                <title>Manage Categories</title>
+                                <sort_order>2</sort_order>
+                            </cat>
+                            <blogs>
+                                <title>Manage Blogs</title>
+                                <sort_order>3</sort_order>
+                            </blogs>
+                            <authors module="blog">
+                                <title>Manage Authors</title>
+                                <sort_order>4</sort_order>
+                            </authors>
+                            <settings>
+                                <title>Settings</title>
+                                <sort_order>5</sort_order>
+                            </settings>
+                        </children>
+                    </blog>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <fontis_blog>
+                                        <title>Fontis Blog Section</title>
+                                    </fontis_blog>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,68 +15,75 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Fontis_Blog_Block_Blog extends Fontis_Blog_Block_Abstract
 {
     const CACHE_TAG = "fontis_blog_index";
 
+    /**
+     * @return Fontis_Blog_Block_Blog
+     */
     protected function _prepareLayout()
     {
         $this->getBlogHelper()->addTagToFpc(array(self::CACHE_TAG, Fontis_Blog_Helper_Data::GLOBAL_CACHE_TAG));
         return parent::_prepareLayout();
     }
 
-    public function getPosts()
+    /**
+     * @return string
+     */
+    public function getHeader()
     {
-        $collection = Mage::getModel("blog/post")->getCollection()
-            ->addStoreFilter(Mage::app()->getStore()->getId())
-            ->setOrder("created_time", "desc");
-        Mage::getSingleton("blog/status")->addEnabledFilterToCollection($collection);
-
-        $page = $this->getRequest()->getParam("page");
-        $collection->setPageSize((int) Mage::getStoreConfig("fontis_blog/blog/perpage"));
-        $collection->setCurPage($page);
-
-        foreach ($collection as $item) {
-            $this->processPost($item, true);
+        $blog = $this->getBlog();
+        $blogTitle = $blog->getTitle();
+        if ($headerImageUrl = $blog->getHeaderImageUrl()) {
+            $content = '<img src="' . $headerImageUrl . '" alt="' . $blogTitle . '" />';
+        } else {
+            $content = $blogTitle;
         }
-        return $collection;
+        return $content;
     }
 
-    public function getPages()
+    /**
+     * @return Fontis_Blog_Model_Post[]|Fontis_Blog_Model_Mysql4_Post_Collection
+     */
+    public function getPosts()
     {
-        if ($perPage = (int) Mage::getStoreConfig("fontis_blog/blog/perpage")) {
-            $collection = Mage::getModel("blog/post")->getCollection()
-                ->addStoreFilter(Mage::app()->getStore()->getId())
-                ->setOrder("created_time ", "desc");
-            Mage::getSingleton("blog/status")->addEnabledFilterToCollection($collection);
+        if (!$this->hasData("blog_posts")) {
+            $blog = $this->getBlog();
 
-            $collection->getSelect()
-                ->reset(Zend_Db_Select::COLUMNS)
-                ->columns(array(new Zend_Db_Expr("count(main_table.post_id) as postcount")));
-            $collection->load();
+            /** @var $postCollection Fontis_Blog_Model_Post[]|Fontis_Blog_Model_Mysql4_Post_Collection */
+            $postCollection = Mage::getModel("blog/post")->getCollection()
+                ->addBlogFilter($blog)
+                ->setOrder("created_time", "desc");
+            Mage::getSingleton("blog/status")->addEnabledFilterToCollection($postCollection);
 
-            $currentPage = (int) $this->getRequest()->getParam("page");
+            $page = $this->getRequest()->getParam("page");
+            $postCollection->setPageSize((int) $blog->getSetting("lists/perpage"));
+            $postCollection->setCurPage($page);
 
-            if (!$currentPage) {
-                $currentPage = 1;
-            }
-
-            $route = $this->getBlogHelper()->getBlogRoute();
-            $pages = ceil($collection->getFirstItem()->getPostcount() / $perPage);
-            $links = "";
-            unset($collection);
-
-            if ($currentPage > 1) {
-                $links .= '<div class="left"><a href="' . $this->getUrl($route . "/page") . ($currentPage - 1) . '">Newer Posts</a></div>';
-            }
-            if ($currentPage < $pages) {
-                $links .= '<div class="right"><a href="' . $this->getUrl($route . "/page") . ($currentPage + 1) . '">Older Posts</a></div>';
-            }
-            echo $links;
+            $this->setData("blog_posts", $postCollection);
         }
+        return $this->getData("blog_posts");
+    }
+
+    /**
+     * @return Fontis_Blog_Model_Cat[]|Fontis_Blog_Model_Mysql4_Cat_Collection
+     */
+    public function getCategories()
+    {
+        if (!$this->hasData("categories")) {
+            $blog = $this->getBlog();
+
+            $categoryCollection = Mage::getModel("blog/cat")->getCollection()
+                ->addBlogFilter($blog)
+                ->setOrder("sort_order", "asc");
+
+            $this->setData("categories", $categoryCollection);
+        }
+        return $this->getData("categories");
     }
 }

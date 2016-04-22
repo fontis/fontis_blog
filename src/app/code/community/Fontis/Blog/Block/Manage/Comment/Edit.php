@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,8 +15,8 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Fontis_Blog_Block_Manage_Comment_Edit extends Mage_Adminhtml_Block_Widget_Form_Container
@@ -47,15 +47,30 @@ class Fontis_Blog_Block_Manage_Comment_Edit extends Mage_Adminhtml_Block_Widget_
                 }
             }
 
-            function saveAndContinueEdit(){
+            function saveAndContinueEdit() {
                 editForm.submit($('edit_form').action+'back/edit/');
             }
         ";
     }
 
+    /**
+     * @return string
+     */
+    public function getBackUrl()
+    {
+        $urlParams = array();
+        if ($currentBlogId = Mage::getSingleton("adminhtml/session")->getCurrentBlogId()) {
+            $urlParams["blog"] = $currentBlogId;
+        }
+        return $this->getUrl("*/*/", $urlParams);
+    }
+
+    /**
+     * @return string
+     */
     public function getHeaderText()
     {
-        if(Mage::registry("blog_data") && Mage::registry("blog_data")->getId()) {
+        if (Mage::registry("blog_data") && Mage::registry("blog_data")->getId()) {
             return Mage::helper("blog")->__("Edit Comment By '%s'", $this->escapeHtml(Mage::registry("blog_data")->getUser()));
         } else {
             return Mage::helper("blog")->__("Add New Comment");

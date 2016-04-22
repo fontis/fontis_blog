@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,129 +15,145 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 ?>
-<?php $_blogHelper = Mage::helper("blog"); ?>
-<?php $post = $this->getPost(); ?>
+
+<?php /** @var $this Fontis_Blog_Block_Post */ ?>
+
+<?php
+/** @var $helper Fontis_Blog_Helper_Data */
+$helper = Mage::helper("blog");
+$blog = $this->getBlog();
+$post = $this->getPost();
+/** @var $customerHelper Mage_Customer_Helper_Data */
+$customerHelper = Mage::helper("customer");
+?>
+
 <div id="messages_product_view"><?php echo $this->getMessagesBlock()->getGroupedHtml(); ?></div>
-<div class="postWrapper">
-    <div class="postTitle">
-        <h2><a href="<?php echo $post->getAddress(); ?>"><?php echo $post->getTitle(); ?></a></h2>
-		<h3><?php echo $post->getCreatedTime(); ?></h3>
+<div class="postWrapper" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+    <meta itemscope itemprop="mainEntityOfPage" itemType="https://schema.org/WebPage" itemid="<?php echo $post->getPostUrl(); ?>"/>
+    <div class="page-title">
+        <h1 itemprop="headline"><?php echo $post->getTitle(); ?></h1>
+        <h3><?php echo $post->getCreatedTime(); ?></h3>
+    </div>
+    <meta itemprop="datePublished" content="<?php echo $this->getMicrodataDatePublished($post); ?>"/>
+    <meta itemprop="dateModified" content="<?php echo $this->getMicrodataDateModified($post); ?>"/>
+    <div style="display:none" itemtype="http://schema.org/Organization" itemscope itemprop="publisher">
+        <meta itemprop="name" content="<?php echo $this->getMicrodataPublisherName(); ?>" />
+        <div style="display:none" itemtype="http://schema.org/ImageObject" itemscope itemprop="logo">
+            <meta itemprop="url" content="<?php echo $this->getMicrodataPublisherLogo(); ?>"/>
+        </div>
     </div>
 
-    <div class="postContent"><?php echo $post->getPostContent(); ?></div>
-    <?php echo $this->getBookmarkHtml($post); ?>
+    <?php if ($postImageUrl = $post->getImageUrl()): ?>
+        <div class="postImage" itemtype="http://schema.org/ImageObject" itemscope itemprop="image">
+            <img src="<?php echo $postImageUrl; ?>" alt="" class="img-responsive" itemprop="url">
+            <?php $imageDimensions = $this->getPostImageDimensions($post); ?>
+            <meta itemprop="width" content="<?php echo $imageDimensions[0]; ?>"/>
+            <meta itemprop="height" content="<?php echo $imageDimensions[1]; ?>"/>
+        </div>
+    <?php elseif ($postSmallImageUrl = $post->getSmallImageUrl()): ?>
+        <div style="display:none" itemtype="http://schema.org/ImageObject" itemscope itemprop="image">
+            <meta itemprop="url" content="<?php echo $postSmallImageUrl; ?>"/>
+            <?php $imageDimensions = $this->getPostSmallImageDimensions($post); ?>
+            <meta itemprop="width" content="<?php echo $imageDimensions[0]; ?>"/>
+            <meta itemprop="height" content="<?php echo $imageDimensions[1]; ?>"/>
+        </div>
+    <?php endif; ?>
+
+    <div class="postContent std" itemprop="articleBody"><?php echo $post->getPostContent(); ?></div>
 
     <div class="postDetails">
-        <?php $postCats = $post->getCats(); ?>
-        <?php if (!empty($postCats)): ?>
-            <?php echo $_blogHelper->__("Posted in"); ?>
-            <?php foreach ($postCats as $title => $url): ?>
-				<a href="<?php echo $url; ?>"><?php echo $title; ?></a>
-            <?php endforeach; ?>
+        <?php $postCats = $post->getCategories(); ?>
+        <?php if ($postCats->getSize() == 0): ?>
+            <?php echo $helper->__("Posted"); ?>
         <?php else: ?>
-            <?php echo $_blogHelper->__("Posted"); ?>
-        <?php endif; ?> By <?php echo $post->getUser(); ?>
+            <?php echo $helper->__("Posted in"); ?>
+            <?php foreach ($postCats as $cat): ?>
+                <a href="<?php echo $cat->getCatUrl(); ?>"><?php echo $this->escapeHtml($cat->getTitle()); ?></a>
+            <?php endforeach; ?>
+        <?php endif; ?> by
+        <?php if ($blog->getSettingFlag("authors/enabled")): ?>
+        <a href="<?php echo $post->getAuthor()->getAuthorUrl(); ?>" itemprop="author"><?php echo $this->escapeHtml($post->getAuthor()->getName()); ?></a>
+        <?php else: ?>
+        <span itemprop="author"><?php echo $this->escapeHtml($post->getAuthor()->getName()); ?></span>
+        <?php endif; ?>
+        <br />
+        <?php $postTags = $post->getTags(); ?>
+        <?php if ($postTags->getSize() > 0): ?>
+            <?php echo $helper->__("Tagged in"); ?>
+            <?php foreach ($postTags as $tag): ?>
+                <a href="<?php echo $tag->getTagUrl(); ?>"><?php echo $this->escapeHtml($tag->getName()); ?></a>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
+    <?php if ($addthisButtonType = $blog->getSetting("posts/addthis_button_type")): ?>
+    <div class="<?php echo $addthisButtonType; ?>"></div>
+    <?php endif; ?>
 </div>
 
-<!-- Comment Section -->
 <?php if ($this->getCommentsEnabled()): ?>
-    <?php $comments = $this->getComment(); ?>
     <div class="postTitle"><a name="commentBox"></a>
-        <h2><?php echo $this->getCommentTotalString($comments); ?></h2>
+        <h2><?php echo $this->getCommentTotalString($post->getCommentCount()); ?></h2>
     </div>
 
-    <?php echo $this->getChild("comments")->setComments($this->commentsThread($comments))->toHtml(); ?>
+    <?php echo $this->getChild("comments")->setComments($post->getThreadedComments())->toHtml(); ?>
 
-    <?php if ($post->getComments()): ?>
-        <div class="postError"><?php echo $_blogHelper->__("Comments are closed for this post"); ?></div>
-    <?php else: ?>
-        <?php if ($_blogHelper->isLoginRequired()): ?>
-            <?php if ($this->helper('customer')->isLoggedIn()): ?>
-                <form action="" id="postComment" method="post">
-                    <fieldset class="group-select">
-                        <h4 class="legend"><?php echo $_blogHelper->__("Submit Comment"); ?></h4>
-                        <ul>
-                            <li id="inReplyToBox" class="no-display">
-                                <input name="in_reply_to" id="in_reply_to" type="hidden" value="" />
-                                In response to: <span id="inReplyToName"></span>
-                            </li>
-                            <li>
-                                <div class="input-box">
-                                    <label for="comment"><?php echo $_blogHelper->__("Comment"); ?><span class="required">*</span></label><br />
-                                    <textarea name="comment" id="comment" title="<?php echo $this->__("Comment"); ?>" class="required-entry input-text" style="height: 150px; width: 400px;" cols="50" rows="5"><?php echo $this->getCommentText(); ?></textarea>
-                                </div>
-                            </li>
-                        </ul>
-                    </fieldset>
-                    <?php if ($_blogHelper->useRecaptcha()): ?>
-                        <div><?php echo $this->getChildHtml("recaptcha_box"); ?></div>
-                    <?php endif; ?>
-                    <div class="button-set">
-                        <input name="post_id" type="hidden" value="<?php echo $post->getPostId(); ?>" />
-                        <input name="email" type="hidden" value="<?php echo $this->escapeHtml($_blogHelper->getUserEmail()); ?>"/>
-                        <input name="user" type="hidden" value="<?php echo $this->escapeHtml($_blogHelper->getUserName()); ?>"/>
-                        <p class="required"><?php echo $this->__('* Required Fields'); ?></p>
-                        <button class="form-button" type="submit"><span><?php echo $_blogHelper->__("Submit Commment"); ?></span></button>
-                    </div>
-                </form>
-                <script type="text/javascript">
-                    function setupReply(commentID) {
-                        document.getElementById("inReplyToName").innerHTML = document.getElementById("commentUser_" + commentID).innerHTML;
-                        document.getElementById("in_reply_to").value = commentID;
-                        document.getElementById("inReplyToBox").className = "";
-                    }
-                </script>
-            <?php else: ?>
-                <p><?php echo $_blogHelper->__("You must be logged in to post a comment."); ?></p>
-                <p><a href="<?php echo $this->getUrl('customer/account/login'); ?>"><?php echo $_blogHelper->__('Click here'); ?></a> <?php echo $_blogHelper->__('to log in'); ?></p>
-            <?php endif; ?>
-        <?php else: ?>
-            <form action="" id="postComment" method="post">
-                <fieldset class="group-select">
-                    <h4 class="legend"><?php echo $_blogHelper->__("Submit Comment"); ?></h4>
-                    <ul>
-                        <li id="inReplyToBox" class="no-display">
-                            <input name="in_reply_to" id="in_reply_to" type="hidden" value="" />
-                            In response to: <span id="inReplyToName"></span>
-                        </li>
-                        <li>
+    <?php if ($post->canPostNewComments()): ?>
+        <form action="<?php echo $this->getFormAction(); ?>" id="postComment" method="post">
+            <fieldset class="group-select">
+                <h4 class="legend"><?php echo $helper->__("Submit Comment"); ?></h4>
+                <ul>
+                    <li id="inReplyToBox" class="no-display">
+                        <input name="in_reply_to" id="in_reply_to" type="hidden" value="" />
+                        In response to: <span id="inReplyToName"></span>
+                    </li>
+                    <li>
+                        <?php if (!$customerHelper->isLoggedIn()): ?>
                             <div class="input-box">
-                                <label for="user"><?php echo $_blogHelper->__('Name'); ?> <span class="required">*</span></label><br />
-                                <input name="user" id="user" value="<?php echo $this->getCommentName(); ?>" title="<?php echo $this->__("Name"); ?>" value="<?php echo $this->escapeHtml($_blogHelper->getUserName()); ?>" class="required-entry input-text" type="text" />
+                                <label for="user"><?php echo $helper->__("Name"); ?> <span class="required">*</span></label><br />
+                                <input name="user" id="user" title="<?php echo $this->__("Name"); ?>" class="required-entry input-text" type="text" />
                             </div>
                             <div class="input-box">
-                                <label for="email"><?php echo $_blogHelper->__('Email'); ?> <span class="required">*</span></label><br />
-                                <input name="email" id="email" value="<?php echo $this->getCommentEmail(); ?>" title="<?php echo $this->__("Email"); ?>" value="<?php echo $this->escapeHtml($_blogHelper->getUserEmail()); ?>" class="required-entry input-text validate-email" type="text" />
+                                <label for="email"><?php echo $helper->__("Email"); ?> <span class="required">*</span></label><br />
+                                <input name="email" id="email" title="<?php echo $this->__("Email"); ?>" class="required-entry input-text validate-email" type="text" />
                             </div>
                             <div class="clear"></div>
-                            <div class="input-box">
-                                <label for="comment"><?php echo $_blogHelper->__('Comment'); ?> <span class="required">*</span></label><br />
-                                <textarea name="comment" id="comment" title="<?php echo $_blogHelper->__("Comment"); ?>" class="required-entry input-text" style="height: 150px; width: 400px;" cols="50" rows="5"><?php echo $this->getCommentText(); ?></textarea>
-                            </div>
-                        </li>
-                    </ul>
-                </fieldset>
-                <?php if ($_blogHelper->useRecaptcha()): ?>
-                    <div><?php echo $this->getChildHtml("recaptcha_box"); ?></div>
+                        <?php endif; ?>
+                        <div class="input-box">
+                            <label for="comment"><?php echo $helper->__("Comment"); ?> <span class="required">*</span></label><br />
+                            <textarea name="comment" id="comment" title="<?php echo $helper->__("Comment"); ?>" class="required-entry input-text" style="height: 150px; width: 400px;" cols="50" rows="5"></textarea>
+                        </div>
+                    </li>
+                </ul>
+            </fieldset>
+            <?php if ($blog->useRecaptcha()): ?>
+                <div><?php echo $this->getChildHtml("recaptcha_box"); ?></div>
+            <?php endif; ?>
+            <div class="button-set">
+                <?php if ($customerHelper->isLoggedIn()): ?>
+                    <input name="email" type="hidden" value="<?php echo $this->escapeHtml($helper->getUserEmail()); ?>"/>
+                    <input name="user" type="hidden" value="<?php echo $this->escapeHtml($helper->getUserName()); ?>"/>
                 <?php endif; ?>
-                <div class="button-set">
-                    <input name="post_id" type="hidden" value="<?php echo $post->getPostId(); ?>" />
-                    <p class="required"><?php echo $this->__('* Required Fields'); ?></p>
-                    <button class="form-button" type="submit"><span><?php echo $_blogHelper->__("Submit Comment"); ?></span></button>
-                </div>
-            </form>
-            <script type="text/javascript">
-                function setupReply(commentID) {
-                    document.getElementById("inReplyToName").innerHTML = document.getElementById("commentUser_" + commentID).innerHTML;
-                    document.getElementById("in_reply_to").value = commentID;
-                    document.getElementById("inReplyToBox").className = "";
-                }
-            </script>
+                <p class="required"><?php echo $this->__("* Required Fields"); ?></p>
+                <button class="button" type="submit"><span><span><?php echo $helper->__("Submit Comment"); ?></span></span></button>
+            </div>
+        </form>
+        <script type="text/javascript">
+            function setupReply(commentID) {
+                document.getElementById("inReplyToName").innerHTML = document.getElementById("commentUser_" + commentID).innerHTML;
+                document.getElementById("in_reply_to").value = commentID;
+                document.getElementById("inReplyToBox").className = "";
+            }
+        </script>
+    <?php else: ?>
+        <?php if ($post->getCommentsDisabled()): ?>
+            <div class="postError"><?php echo $helper->__("Comments are closed for this post"); ?></div>
+        <?php elseif ($this->isLoginRequired() === true && !$customerHelper->isLoggedIn()): ?>
+            <p><?php echo $helper->__("You must be logged in to post a comment."); ?></p>
+            <p><a href="<?php echo $customerHelper->getLoginUrl(); ?>"><?php echo $helper->__("Click here"); ?></a> <?php echo $helper->__("to log in"); ?></p>
         <?php endif; ?>
     <?php endif; ?>
 <?php endif; ?>

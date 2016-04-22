@@ -29,16 +29,6 @@
     font-size: 12px;
 }
 
-.postBookmarks {
-    padding-bottom: 15px;
-}
-
-.postBookmarks h4 {
-    padding-bottom: 5px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
 .commentWrapper {
     padding-top: 10px;
 }
@@ -79,8 +69,4 @@
 
 .postError {
     font-size: 16px;
-}
-
-.box.base-mini.blog li.active {
-    font-weight: bold;
 }

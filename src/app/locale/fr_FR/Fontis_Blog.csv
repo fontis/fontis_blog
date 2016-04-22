@@ -22,12 +22,14 @@ Category Manager,Gestionnaire des cat&eacute;gories
 Change status,Changer le statut
 click here,cliquez ici
 Comment,Commentaire
+%s Comment,%s Commentaire
 Comment Information,Information sur le commentaire
 Comment was approved,Le commentaire a bien &eacute;t&eacute; approuv&eacute;
 Comment was successfully deleted,Le commentaire a bien &eacute;t&eacute; supprim&eacute;
 Comment was successfully saved,Le commentaire a bien &eacute;t&eacute; sauvegard&eacute;
 Comment was unapproved,Le commentaire a &eacute;t&eacute; d&eacute;sapprouv&eacute;
 Comments,Commentaires
+%s Comments,%s Commentaires
 Comments are not enabled.,Les commentaires sont d&eacute;sactiv&eacute;s.
 Content,Contenu
 Created,Cr&eacute;&eacute;
@@ -76,8 +78,8 @@ Please select comment(s),Merci de s&eacute;lectionner au moins un commentaire
 Please select post(s),Merci de s&eacute;lectionner au moins un article
 Post was successfully deleted,L'article a bien &eacute;t&eacute; supprim&eacute;
 Post does not exist,L'article n'existe pas
-Post Identifier already exists.,L'identifiant choisi existe d&eacute;j&agrave; pour un autre article
-Post Identifier cannot consist only of numbers.,L'identifiant de l'article ne peut pas contenir que des chiffres.
+Post identifier already exists.,L'identifiant choisi existe d&eacute;j&agrave; pour un autre article
+Post identifier cannot consist only of numbers.,L'identifiant de l'article ne peut pas contenir que des chiffres.
 Post Information,Informations de l'article
 Post was successfully deleted,L'article a bien &eacute;t&eacute; supprim&eacute;
 Post was successfully saved,L'article a bien &eacute;t&eacute; sauvegard&eacute;

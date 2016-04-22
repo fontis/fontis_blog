@@ -19,3 +19,4 @@ src/app/locale/en_US/template/email/comment_submitted.html         app/locale/en
 src/app/locale/fr_FR/template/email/comment_submitted.html         app/locale/fr_FR/template/email/comment_submitted.html
 
 src/skin/frontend/base/default/fontis/blog                         skin/frontend/base/default/fontis/blog
+

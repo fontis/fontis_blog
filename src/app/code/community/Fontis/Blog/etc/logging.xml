@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Fontis Blog Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * Parts of this software are derived from code originally developed by
+ * Robert Chambers <magento@robertchambers.co.uk>
+ * and released as "Lazzymonk's Blog" 0.5.8 in 2009.
+ *
+ * @category   Fontis
+ * @package    Fontis_Blog
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<logging>
+    <fontis_blog translate="label">
+        <label>Fontis Blog</label>
+        <actions>
+            <adminhtml_blog_blog_edit>
+                <action>view</action>
+                <expected_models>
+                    <blog__blog/>
+                </expected_models>
+            </adminhtml_blog_blog_edit>
+            <adminhtml_blog_blog_save>
+                <action>save</action>
+                <expected_models>
+                    <blog__blog/>
+                </expected_models>
+            </adminhtml_blog_blog_save>
+            <adminhtml_blog_blog_delete>
+                <action>delete</action>
+                <expected_models>
+                    <blog__blog/>
+                </expected_models>
+            </adminhtml_blog_blog_delete>
+
+            <adminhtml_blog_post_edit>
+                <action>view</action>
+                <expected_models>
+                    <blog__blog/>
+                    <blog__post/>
+                </expected_models>
+            </adminhtml_blog_post_edit>
+            <adminhtml_blog_post_save>
+                <action>save</action>
+                <expected_models>
+                    <blog__post>
+                        <skip_data>
+                            <author/>
+                            <blog/>
+                            <categories/>
+                            <tags/>
+                        </skip_data>
+                    </blog__post>
+                </expected_models>
+                <skip_on_back>
+                    <adminhtml_blog_post_edit/>
+                </skip_on_back>
+            </adminhtml_blog_post_save>
+            <adminhtml_blog_post_delete>
+                <action>delete</action>
+                <expected_models>
+                    <blog__post/>
+                </expected_models>
+            </adminhtml_blog_post_delete>
+            <adminhtml_blog_post_massStatus>
+                <action>massUpdate</action>
+                <expected_models>
+                    <blog__post/>
+                </expected_models>
+            </adminhtml_blog_post_massStatus>
+            <adminhtml_blog_post_massDelete>
+                <adction>massDelete</adction>
+                <expected_models>
+                    <blog__post/>
+                </expected_models>
+            </adminhtml_blog_post_massDelete>
+        </actions>
+    </fontis_blog>
+</logging>

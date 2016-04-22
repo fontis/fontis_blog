@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,124 +15,177 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Fontis_Blog_Model_Mysql4_Post extends Mage_Core_Model_Mysql4_Abstract
 {
+    const PK_FIELD = "post_id";
+
     protected function _construct()
     {
-        $this->_init('blog/post', 'post_id');
+        // Note that post_id refers to the primary key field in your database table.
+        $this->_init("blog/post", self::PK_FIELD);
     }
 
+    /**
+     * @param Mage_Core_Model_Abstract $object
+     * @param mixed $value
+     * @param string $field
+     * @return Fontis_Blog_Model_Mysql4_Post
+     */
     public function load(Mage_Core_Model_Abstract $object, $value, $field = null)
     {
-        if (strcmp($value, (int) $value) !== 0) {
-            $field = 'identifier';
+        if ($field == null) {
+            /**
+             * If a fieldname wasn't explicitly specified, check to see if the value
+             * is an integer. If not, assume it is the post identifier, and use that
+             * as the fieldname.
+             */
+            if (strcmp($value, (int) $value) !== 0) {
+                $field = "identifier";
+            }
         }
         return parent::load($object, $value, $field);
     }
 
-    protected function _beforeSave(Mage_Core_Model_Abstract $object)
+    /**
+     * @param Mage_Core_Model_Abstract $post
+     * @return Fontis_Blog_Model_Mysql4_Post
+     * @throws Mage_Core_Exception
+     */
+    protected function _beforeSave(Mage_Core_Model_Abstract $post)
     {
-        if (!$this->getIsUniqueIdentifier($object)) {
-            Mage::throwException(Mage::helper('blog')->__('Post Identifier already exists.'));
+        /** @var $helper Fontis_Blog_Helper_Data */
+        $helper = Mage::helper("blog");
+
+        if (!$this->getIsUniqueIdentifier($post)) {
+            Mage::throwException($helper->__("Post identifier already exists."));
         }
 
-        if ($this->isNumericIdentifier($object)) {
-            Mage::throwException(Mage::helper('blog')->__('Post Identifier cannot consist only of numbers.'));
+        if ($this->isNumericIdentifier($post)) {
+            Mage::throwException($helper->__("Post identifier cannot consist only of numbers."));
+        }
+
+        if ($helper->checkForReservedWord($post->getData("identifier"))) {
+            Mage::throwException($helper->__("Post identifier cannot be a reserved word."));
         }
 
         return $this;
     }
 
-    public function getIsUniqueIdentifier(Mage_Core_Model_Abstract $object)
+    /**
+     * @param Mage_Core_Model_Abstract $post
+     * @return bool
+     */
+    public function getIsUniqueIdentifier(Mage_Core_Model_Abstract $post)
     {
-        $select = $this->_getWriteAdapter()->select()
-                ->from($this->getMainTable())
-                ->where($this->getMainTable() . '.identifier = ?', $object->getData('identifier'));
-        if ($object->getId()) {
-            $select->where($this->getMainTable() . '.post_id <> ?', $object->getId());
+        $mainTable = $this->getMainTable();
+        $select = $this->_getReadAdapter()->select()
+                ->from($mainTable)
+                ->where($mainTable . ".identifier = ?", $post->getData("identifier"))
+                ->where($mainTable . ".blog_id = ?", $post->getData("blog_id"));
+        if ($post->getId()) {
+            $select->where($mainTable . ".post_id <> ?", $post->getId());
         }
 
-        if ($this->_getWriteAdapter()->fetchRow($select)) {
+        if ($this->_getReadAdapter()->fetchRow($select)) {
             return false;
         }
 
         return true;
     }
 
-    protected function isNumericIdentifier(Mage_Core_Model_Abstract $object)
+    /**
+     * @param Mage_Core_Model_Abstract $post
+     * @return int|bool
+     */
+    protected function isNumericIdentifier(Mage_Core_Model_Abstract $post)
     {
-        return preg_match('/^[0-9]+$/', $object->getData('identifier'));
-    }
-
-    protected function _afterSave(Mage_Core_Model_Abstract $object)
-    {
-        $writeAdapter = $this->_getWriteAdapter();
-        $condition = $writeAdapter->quoteInto("post_id = ?", $object->getId());
-        $writeAdapter->delete($this->getTable("store"), $condition);
-
-        if ($object->getData("stores")) {
-            foreach ((array) $object->getData("stores") as $store) {
-                $storeArray = array();
-                $storeArray["post_id"] = $object->getId();
-                $storeArray["store_id"] = $store;
-                $writeAdapter->insert($this->getTable("store"), $storeArray);
-            }
-        } else {
-            $storeArray = array();
-            $storeArray["post_id"] = $object->getId();
-            $storeArray["store_id"] = Mage::app()->getStore(true)->getId();
-            $writeAdapter->insert($this->getTable("store"), $storeArray);
-        }
-
-        $condition = $writeAdapter->quoteInto("post_id = ?", $object->getId());
-        $writeAdapter->delete($this->getTable("post_cat"), $condition);
-
-        foreach ((array) $object->getData("cats") as $catId) {
-            $storeArray = array();
-            $storeArray["post_id"] = $object->getId();
-            $storeArray["cat_id"] = $catId;
-            $writeAdapter->insert($this->getTable("post_cat"), $storeArray);
-        }
-
-        return parent::_afterSave($object);
+        return preg_match("/^[0-9]+$/", $post->getData("identifier"));
     }
 
     /**
-     *
-     * @param Mage_Core_Model_Abstract $object
+     * @param Mage_Core_Model_Abstract $post
+     * @return Fontis_Blog_Model_Mysql4_Post
      */
-    protected function _afterLoad(Mage_Core_Model_Abstract $object)
+    protected function _afterSave(Mage_Core_Model_Abstract $post)
     {
-        $readAdapter = $this->_getReadAdapter();
-        $select = $readAdapter->select()
-            ->from($this->getTable("store"))
-            ->where("post_id = ?", $object->getId());
+        $writeAdapter = $this->_getWriteAdapter();
+        $this->saveCats($post, $writeAdapter);
+        $this->saveTags($post, $writeAdapter);
 
-        if ($data = $readAdapter->fetchAll($select)) {
-            $storesArray = array();
-            foreach ($data as $row) {
-                $storesArray[] = $row["store_id"];
-            }
-            $object->setData("store_id", $storesArray);
+        return parent::_afterSave($post);
+    }
+
+    /**
+     * @param Mage_Core_Model_Abstract $post
+     * @param Varien_Db_Adapter_Interface $writeAdapter
+     */
+    protected function saveCats(Mage_Core_Model_Abstract $post, $writeAdapter)
+    {
+        $tableName = $this->getTable("blog/post_cat");
+        $condition = $writeAdapter->quoteInto(self::PK_FIELD . " = ?", $post->getId());
+        $writeAdapter->delete($tableName, $condition);
+
+        foreach ((array) $post->getData("cat_ids") as $catId) {
+            $catArray = array(
+                self::PK_FIELD  => $post->getId(),
+                "cat_id"        => $catId,
+            );
+            $writeAdapter->insert($tableName, $catArray);
+        }
+    }
+
+    /**
+     * @param Mage_Core_Model_Abstract $post
+     * @param Varien_Db_Adapter_Interface $writeAdapter
+     */
+    protected function saveTags(Mage_Core_Model_Abstract $post, $writeAdapter)
+    {
+        $postTagTableName = $this->getTable("blog/post_tag");
+
+        $condition = $writeAdapter->quoteInto(self::PK_FIELD . " = ?", $post->getId());
+        $writeAdapter->delete($postTagTableName, $condition);
+
+        $tagIds = $post->getData("tag_ids");
+        if (!$tagIds) {
+            Mage::getResourceModel("blog/tag")->clearStaleTags();
+            return;
         }
 
-        $select = $readAdapter->select()
-            ->from($this->getTable("post_cat"))
-            ->where("post_id = ?", $object->getId());
-
-        if ($data = $readAdapter->fetchAll($select)) {
-            $catsArray = array();
-            foreach ($data as $row) {
-                $catsArray[] = $row["cat_id"];
+        /** @var $helper Fontis_Blog_Helper_Data */
+        $helper = Mage::helper("blog");
+        $blogId = $post->getBlogId();
+        foreach ($tagIds as $tagIdentifier => $tagData) {
+            $tagName = trim($tagData["tag_id"]);
+            if (empty($tagName)) {
+                continue;
             }
-            $object->setData("cats", $catsArray);
+
+            /** @var $tag Fontis_Blog_Model_Tag */
+            $tag = Mage::getModel("blog/tag")->setBlogId($blogId)->load($tagIdentifier);
+            if (!$tag->getId()) {
+                // The tag might be new to the post, but still already exist in the database.
+                $tag->setBlogId($blogId)->load($helper->toAscii($tagName));
+            }
+            if ($tag->getName() != $tagName) {
+                $tag->setName($tagName);
+                $tagIdentifier = $helper->toAscii($tagData["tag_id"]);
+                $tag->setIdentifier($tagIdentifier);
+                $tag->setBlogId($blogId);
+                $tag->save();
+            }
+
+            $tagArray = array(
+                Fontis_Blog_Model_Mysql4_Tag::PK_FIELD => $tag->getId(),
+                self::PK_FIELD => $post->getId(),
+            );
+            $writeAdapter->insert($postTagTableName, $tagArray);
         }
 
-        return parent::_afterLoad($object);
+        Mage::getResourceModel("blog/tag")->clearStaleTags();
     }
 
     /**
@@ -140,18 +193,17 @@ class Fontis_Blog_Model_Mysql4_Post extends Mage_Core_Model_Mysql4_Abstract
      *
      * @param string $field
      * @param mixed $value
+     * @param Fontis_Blog_Model_Post $post
      * @return Zend_Db_Select
      */
-    protected function _getLoadSelect($field, $value, $object)
+    protected function _getLoadSelect($field, $value, $post)
     {
-        $select = parent::_getLoadSelect($field, $value, $object);
+        $select = parent::_getLoadSelect($field, $value, $post);
 
-        if ($object->getStoreId()) {
-            $select->join(array("cps" => $this->getTable("store")), $this->getMainTable() . ".post_id = `cps`.post_id")
-                ->where("`cps`.store_id in (0, ?) ", $object->getStoreId())
-                ->order("store_id DESC")
-                ->limit(1);
+        if ($blogId = $post->getBlogId()) {
+            $select->where($this->getMainTable() . ".blog_id = ?", $blogId);
         }
+
         return $select;
     }
 }

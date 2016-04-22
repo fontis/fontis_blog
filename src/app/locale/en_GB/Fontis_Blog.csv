@@ -22,12 +22,13 @@ Category Manager,Category Manager
 Change status,Change status
 click here,click here
 Comment,Comment
+%s Comment,Comment
 Comment Information,Comment Information
 Comment was approved,Comment was approved
 Comment was successfully deleted,Comment was successfully deleted
 Comment was successfully saved,Comment was successfully saved
 Comment was unapproved,Comment was unapproved
-Comments,Comments
+%s Comments,%s Comments
 Comments are not enabled.,Comments are not enabled.
 Content,Content
 Created,Created
@@ -76,8 +77,8 @@ Please select comment(s),Please select comment(s)
 Please select post(s),Please select post(s)
 Post was successfully deleted,Post was successfully deleted
 Post does not exist,Post does not exist
-Post Identifier already exists.,Post Identifier already exists.
-Post Identifier cannot consist only of numbers.,Post Identifier cannot consist only of numbers.
+Post identifier already exists.,Post identifier already exists.
+Post identifier cannot consist only of numbers.,Post identifier cannot consist only of numbers.
 Post Information,Post Information
 Post was successfully deleted,Post was successfully deleted
 Post was successfully saved,Post was successfully saved

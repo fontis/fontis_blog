@@ -8,7 +8,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -16,8 +16,8 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 
@@ -25,88 +25,146 @@
     <default>
         <reference name="head">
             <block type="blog/links" name="add.blog.rss">
-                <action method="addRssFeed" ifconfig="fontis_blog/rss/enabled"></action>
+                <action method="addRssFeed"><scope>2</scope></action>
             </block>
             <action method="addItem"><type>skin_css</type><name>fontis/blog/css/blog.css</name></action>
         </reference>
         <reference name="top.links">
             <block type="blog/links" name="add.blog.link">
-                <action method="addTopLink" ifconfig="fontis_blog/menu/top"></action>
+                <action method="addTopLink"></action>
             </block>
         </reference>
         <reference name="footer_links">
             <block type="blog/links" name="add.blog.footer">
-                <action method="addFooterLink" ifconfig="fontis_blog/menu/footer"></action>
+                <action method="addFooterLink"></action>
             </block>
         </reference>
     </default>
 
-    <blog_page>
+    <blog-page>
+        <reference name="root">
+            <action method="addBodyClass"><class>blog-page</class></action>
+        </reference>
+        <reference name="head">
+            <remove name="add.blog.rss" />
+            <block type="blog/links" name="add.blog.rss.blogpage">
+                <action method="addRssFeed"><scope>1</scope></action>
+            </block>
+        </reference>
         <reference name="left">
             <block type="blog/menu" name="left.blog.menu">
-                <action method="setTemplate" ifconfig="fontis_blog/menu/left">
-                    <template>fontis/blog/menu.phtml</template>
-                </action>
+                <action method="setTemplate"><template>fontis/blog/menu.phtml</template><test>menu/left</test></action>
                 <block type="blog/menu" name="left.blog.menu.archives" as="archives">
-                    <action method="setTemplate" ifconfig="fontis_blog/archives/enabled">
-                        <template>fontis/blog/menu/archives.phtml</template>
-                    </action>
+                    <action method="setTemplate"><template>fontis/blog/menu/archives.phtml</template><test>archives/enabled</test></action>
+                    <action method="setUseArchiveLimit"><value>1</value></action>
+                </block>
+                <block type="blog/menu" name="left.blog.menu.tags" as="tags">
+                    <action method="setTemplate"><template>fontis/blog/menu/tags.phtml</template><test>menu/tags</test></action>
+                    <action method="setTagLimit"><value>-1</value></action>
                 </block>
             </block>
         </reference>
         <reference name="right">
             <block type="blog/menu" name="right.blog.menu">
-                <action method="setTemplate" ifconfig="fontis_blog/menu/right">
-                    <template>fontis/blog/menu.phtml</template>
-                </action>
+                <action method="setTemplate"><template>fontis/blog/menu.phtml</template><test>menu/right</test></action>
                 <block type="blog/menu" name="right.blog.menu.archives" as="archives">
-                    <action method="setTemplate" ifconfig="fontis_blog/archives/enabled">
-                        <template>fontis/blog/menu/archives.phtml</template>
-                    </action>
+                    <action method="setTemplate"><template>fontis/blog/menu/archives.phtml</template><test>archives/enabled</test></action>
+                    <action method="setUseArchiveLimit"><value>1</value></action>
+                </block>
+                <block type="blog/menu" name="right.blog.menu.tags" as="tags">
+                    <action method="setTemplate"><template>fontis/blog/menu/tags.phtml</template><test>menu/tags</test></action>
+                    <action method="setTagLimit"><value>-1</value></action>
                 </block>
             </block>
         </reference>
-    </blog_page>
+    </blog-page>
 
-    <blog_index_index>
-        <reference name="content">
-            <block type="blog/blog" name="blog" template="fontis/blog/blog.phtml" />
+    <blog-list-page>
+        <reference name="root">
+            <action method="addBodyClass"><class>blog-list-page</class></action>
         </reference>
-        <update handle="blog_page" />
-    </blog_index_index>
+    </blog-list-page>
 
-    <blog_post_view>
+    <blog-home>
+        <reference name="content">
+            <block type="blog/blog" name="blog" template="fontis/blog/blog.phtml">
+                <block type="blog/pager_blog" name="blog_pager" template="fontis/blog/pager.phtml" />
+            </block>
+        </reference>
+        <update handle="blog-page" />
+        <update handle="blog-list-page" />
+    </blog-home>
+
+    <blog-post-view>
         <reference name="content">
             <block type="blog/post" name="post" template="fontis/blog/post.phtml">
-                <block type="blog/post" name="comments" template="fontis/blog/post/comments.phtml" />
+                <block type="blog/post_comment" name="comments" template="fontis/blog/post/comments.phtml" />
                 <block type="core/template" name="recaptcha.box" as="recaptcha_box" template="fontis/recaptcha/recaptcha.phtml" />
             </block>
         </reference>
-        <update handle="blog_page" />
-    </blog_post_view>
+        <update handle="blog-page" />
+    </blog-post-view>
 
-    <blog_cat_view>
+    <blog-cat-view>
         <reference name="content">
-            <block type="blog/cat" name="cat" template="fontis/blog/cat.phtml" />
+            <block type="blog/cat" name="cat" template="fontis/blog/blog.phtml">
+                <block type="blog/pager_cat" name="blog_pager" template="fontis/blog/pager.phtml" />
+            </block>
         </reference>
-        <update handle="blog_page" />
-    </blog_cat_view>
+        <update handle="blog-page" />
+        <update handle="blog-list-page" />
+    </blog-cat-view>
 
-    <blog_archive_index>
+    <blog-archive-list>
         <reference name="content">
-            <block type="blog/menu" name="archive" template="fontis/blog/menu/archives.phtml" />
+            <block type="blog/menu" name="archive" template="fontis/blog/menu/archives.phtml">
+                <action method="setUseArchiveLimit"><value>0</value></action>
+            </block>
         </reference>
-        <update handle="blog_page" />
-    </blog_archive_index>
+        <update handle="blog-page" />
+    </blog-archive-list>
 
-    <blog_archive_view>
+    <blog-archive-view>
         <reference name="content">
-            <block type="blog/archive" name="archive" template="fontis/blog/archive/posts.phtml" />
+            <block type="blog/archive" name="archive" template="fontis/blog/blog.phtml" />
         </reference>
-        <update handle="blog_page" />
-    </blog_archive_view>
+        <update handle="blog-page" />
+        <update handle="blog-list-page" />
+    </blog-archive-view>
 
-    <blog_rss_index>
+    <blog-tag-list>
+        <reference name="content">
+            <block type="blog/menu" name="tag" template="fontis/blog/menu/tags.phtml">
+                <action method="setTagLimit"><value>-1</value></action>
+            </block>
+        </reference>
+        <update handle="blog-page" />
+    </blog-tag-list>
+
+    <blog-tag-view>
+        <reference name="content">
+            <block type="blog/tag" name="tag" template="fontis/blog/blog.phtml" />
+        </reference>
+        <update handle="blog-page" />
+        <update handle="blog-list-page" />
+    </blog-tag-view>
+
+    <blog-author-list>
+        <reference name="content">
+            <block type="blog/author_list" name="author_list" template="fontis/blog/author/list.phtml" />
+        </reference>
+        <update handle="blog-page" />
+    </blog-author-list>
+
+    <blog-author-view>
+        <reference name="content">
+            <block type="blog/author" name="author" template="fontis/blog/blog.phtml" />
+        </reference>
+        <update handle="blog-page" />
+        <update handle="blog-list-page" />
+    </blog-author-view>
+
+    <blog-rss-feed>
         <block type="blog/rss" output="toHtml" name="rss.blog.new" />
-    </blog_rss_index>
+    </blog-rss-feed>
 </layout>

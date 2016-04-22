@@ -28,8 +28,10 @@ Comment was successfully deleted,Kommentar wurde erfolgreich gel&ouml;scht
 Comment was successfully saved,Kommentar wurde erfolgreich gespeichert
 Comment was unapproved,Kommentar wurde nicht freigegeben
 Comments,Kommentare
+%s Comments,%s Kommentare
 Comments are not enabled.,Komentare nicht angeschaltet.
 Content,Inhalt
+%s Content,%s Inhalt
 Created,Erstellt
 Delete,L&ouml;schen
 Delete Category,Kategorie l&ouml;schen
@@ -76,8 +78,8 @@ Please select comment(s),Bitte Kommentar(e) ausw&auml;hlen
 Please select post(s),Bitte Beitrag ausw&auml;hlen
 Post was successfully deleted,Beitrag wurde erfolgreich gel&ouml;scht
 Post does not exist,Beitrag existiert nicht
-Post Identifier already exists.,Postidentifizierer existiert bereits
-Post Identifier cannot consist only of numbers.,Postidentifizierer darf nicht aus Nummern bestehen.
+Post identifier already exists.,Postidentifizierer existiert bereits
+Post identifier cannot consist only of numbers.,Postidentifizierer darf nicht aus Nummern bestehen.
 Post Information,Informationen &uuml;ber Beitr&auml;ge
 Post was successfully deleted,Beitrag wurde erfolgreich gel&ouml;scht
 Post was successfully saved,Beitrag wurde erfolgreich gespeichert

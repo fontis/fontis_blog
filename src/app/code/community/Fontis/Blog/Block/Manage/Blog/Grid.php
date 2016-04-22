@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,8 +15,8 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Fontis_Blog_Block_Manage_Blog_Grid extends Mage_Adminhtml_Block_Widget_Grid
@@ -25,21 +25,29 @@ class Fontis_Blog_Block_Manage_Blog_Grid extends Mage_Adminhtml_Block_Widget_Gri
     {
         parent::__construct();
         $this->setId("blogGrid");
-        $this->setDefaultSort("created_time");
-        $this->setDefaultDir("DESC");
+        $this->setDefaultSort("id");
+        $this->setDefaultDir("asc");
         $this->setSaveParametersInSession(true);
+        $this->_emptyText = Mage::helper("blog")->__("No blogs found.");
     }
 
-    protected function _getStore()
+    /**
+     * @return Mage_Core_Model_Store
+     */
+    protected function getStore()
     {
-        $storeId = (int) $this->getRequest()->getParam("store", 0);
+        $storeId = (int) $this->getRequest()->getParam("store", Mage_Core_Model_App::ADMIN_STORE_ID);
         return Mage::app()->getStore($storeId);
     }
 
+    /**
+     * @return Fontis_Blog_Block_Manage_Blog_Grid
+     */
     protected function _prepareCollection()
     {
-        $collection = Mage::getModel("blog/post")->getCollection();
-        $store = $this->_getStore();
+        /** @var $collection Fontis_Blog_Model_Mysql4_Blog_Collection */
+        $collection = Mage::getModel("blog/blog")->getCollection();
+        $store = $this->getStore();
         if ($store->getId()) {
             $collection->addStoreFilter($store);
         }
@@ -47,15 +55,19 @@ class Fontis_Blog_Block_Manage_Blog_Grid extends Mage_Adminhtml_Block_Widget_Gri
         return parent::_prepareCollection();
     }
 
+    /**
+     * @return Fontis_Blog_Block_Manage_Blog_Grid
+     */
     protected function _prepareColumns()
     {
         $blogHelper = Mage::helper("blog");
 
-        $this->addColumn("post_id", array(
+        $this->addColumn("blog_id", array(
             "header"    => $blogHelper->__("ID"),
             "align"     => "right",
-            "width"     => "50px",
-            "index"     => "post_id",
+            "width"     => "80px",
+            "type"      => "number",
+            "index"     => "blog_id",
         ));
 
         $this->addColumn("title", array(
@@ -64,34 +76,10 @@ class Fontis_Blog_Block_Manage_Blog_Grid extends Mage_Adminhtml_Block_Widget_Gri
             "index"     => "title",
         ));
 
-        $this->addColumn("identifier", array(
-            "header"    => $blogHelper->__("Identifier"),
+        $this->addColumn("route", array(
+            "header"    => $blogHelper->__("Route"),
             "align"     => "left",
-            "index"     => "identifier",
-        ));
-
-        $this->addColumn("user", array(
-            "header"    => $blogHelper->__("Poster"),
-            "width"     => "150px",
-            "index"     => "user",
-        ));
-
-        $this->addColumn("created_time", array(
-            "header"    => $blogHelper->__("Created"),
-            "align"     => "left",
-            "width"     => "120px",
-            "type"      => "date",
-            "default"   => "--",
-            "index"     => "created_time",
-        ));
-
-        $this->addColumn("update_time", array(
-            "header"    => $blogHelper->__("Updated"),
-            "align"     => "left",
-            "width"     => "120px",
-            "type"      => "date",
-            "default"   => "--",
-            "index"     => "update_time",
+            "index"     => "route",
         ));
 
         $this->addColumn("status", array(
@@ -100,63 +88,33 @@ class Fontis_Blog_Block_Manage_Blog_Grid extends Mage_Adminhtml_Block_Widget_Gri
             "width"     => "80px",
             "index"     => "status",
             "type"      => "options",
-            "options"   => Mage::getSingleton("blog/status")->getOptionArray(),
+            "options"   => Mage::getSingleton("blog/system_blogStatus")->getOptions(),
         ));
 
-        $this->addColumn("action",
-            array(
-                "header"    =>  $blogHelper->__("Action"),
-                "width"     => "100px",
-                "type"      => "action",
-                "getter"    => "getId",
-                "actions"   => array(
-                    array(
-                        "caption"   => $blogHelper->__("Edit"),
-                        "url"       => array("base" => "*/*/edit"),
-                        "field"     => "id"
-                    )
-                ),
-                "filter"    => false,
-                "sortable"  => false,
-                "index"     => "stores",
-                "is_system" => true,
-            )
-        );
+        $this->addColumn("action", array(
+            "header"    =>  $blogHelper->__("Action"),
+            "width"     => "100px",
+            "type"      => "action",
+            "getter"    => "getId",
+            "actions"   => array(
+                array(
+                    "caption"   => $blogHelper->__("Edit"),
+                    "url"       => array("base" => "*/*/edit"),
+                    "field"     => "id",
+                )
+            ),
+            "filter"    => false,
+            "sortable"  => false,
+            "is_system" => true,
+        ));
 
         return parent::_prepareColumns();
     }
 
-    protected function _prepareMassaction()
-    {
-        $blogHelper = Mage::helper("blog");
-        $this->setMassactionIdField("post_id");
-        $this->getMassactionBlock()->setFormFieldName("blog");
-
-        $this->getMassactionBlock()->addItem("delete", array(
-             "label"    => $blogHelper->__("Delete"),
-             "url"      => $this->getUrl("*/*/massDelete"),
-             "confirm"  => $blogHelper->__("Are you sure?")
-        ));
-
-        $statuses = Mage::getSingleton("blog/status")->getOptionArray();
-
-        array_unshift($statuses, array("label" => "", "value" => ""));
-        $this->getMassactionBlock()->addItem("status", array(
-            "label" => $blogHelper->__("Change status"),
-            "url"   => $this->getUrl("*/*/massStatus", array("_current" => true)),
-            "additional" => array(
-                "visibility" => array(
-                     "name"     => "status",
-                     "type"     => "select",
-                     "class"    => "required-entry",
-                     "label"    => $blogHelper->__("Status"),
-                     "values"   => $statuses
-                )
-            )
-        ));
-        return $this;
-    }
-
+    /**
+     * @param object $row
+     * @return string
+     */
     public function getRowUrl($row)
     {
         return $this->getUrl("*/*/edit", array("id" => $row->getId()));

@@ -1,0 +1,56 @@
+<?php
+/**
+ * Fontis Blog Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * Parts of this software are derived from code originally developed by
+ * Robert Chambers <magento@robertchambers.co.uk>
+ * and released as "Lazzymonk's Blog" 0.5.8 in 2009.
+ *
+ * @category   Fontis
+ * @package    Fontis_Blog
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+
+<?php /** @var $this Mage_Adminhtml_Block_Widget_Form_Renderer_Fieldset_Element */ ?>
+
+<?php
+/** @var $element Varien_Data_Form_Element_Abstract */
+$element = $this->getElement();
+$trId = $element->getHtmlContainerId();
+$class = $element->getFieldsetHtmlClass();
+$namePrefix = preg_replace('#\[value\](\[\])?$#', "", $element->getName());
+$usingDefault = $element->getDisabled() ? 'checked="checked"' : "";
+?>
+
+<?php if (!$element->getNoDisplay()): ?>
+<tr<?php if ($trId): ?> id="<?php echo $trId; ?>"<?php endif; ?>>
+    <?php if ($element->getType() == "hidden"): ?>
+    <td colspan="3" class="hidden"><?php echo trim($element->getElementHtml()); ?></td>
+    <?php else: ?>
+    <td class="label<?php echo $class ? " {$class}-label" : ''?>" title="<?php echo $element->getSettingKey(); ?>"><?php echo trim($element->getLabelHtml()); ?></td>
+    <td class="<?php echo $element->hasValueClass() ? $element->getValueClass() : 'value' ?><?php echo $class ? " {$class}-value" : ""; ?>">
+        <?php echo trim($element->getElementHtml()); ?>
+        <?php if ($note = $element->getNote()): ?>
+            <p class="note<?php echo $class ? " {$class}-note" : ''; ?>" id="note_<?php echo $element->getId(); ?>"><span><?php echo $note; ?></span></p>
+        <?php endif; ?>
+    </td>
+    <td class="use-default">
+        <?php if ($element->getCanInherit()): ?>
+        <input id="<?php echo $element->getHtmlId(); ?>_inherit" name="<?php echo $namePrefix; ?>[inherit]" type="checkbox" value="1" class="checkbox config-inherit" onclick="toggleValueElements(this, Element.previous(this.parentNode))" <?php echo $usingDefault; ?> />
+        <label for="<?php echo $element->getHtmlId(); ?>_inherit" class="inherit"><?php echo $this->__("Use Default"); ?></label>
+        <?php else: ?>
+        <input id="<?php echo $element->getHtmlId(); ?>_inherit" name="<?php echo $namePrefix; ?>[inherit]" type="hidden" value="0" />
+        <?php endif; ?>
+    </td>
+    <?php endif; ?>
+</tr>
+<?php endif; ?>

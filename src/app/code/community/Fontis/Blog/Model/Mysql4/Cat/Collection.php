@@ -7,7 +7,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -15,83 +15,79 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Fontis_Blog_Model_Mysql4_Cat_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
 {
+    /**
+     * @var string
+     */
+    protected $_eventPrefix = "fontis_blog_cat_collection";
+
+    /**
+     * @var string
+     */
+    protected $_eventObject = "collection";
+
     public function _construct()
     {
-        $this->_init('blog/cat');
+        $this->_init("blog/cat");
     }
 
-    public function toOptionArray()
+    /**
+     * @param Fontis_Blog_Model_Post|int|int[] $post
+     * @return Fontis_Blog_Model_Cat[]|Fontis_Blog_Model_Mysql4_Cat_Collection
+     */
+    public function addPostFilter($post)
     {
-        return $this->_toOptionArray('identifier', 'title');
-    }
-
-    protected function _afterLoad()
-    {
-        $items = $this->getColumnValues('identifier');
-        if (count($items)) {
-            $select = $this->getConnection()->select()
-                ->from($this->getTable('cat'));
-            if ($result = $this->getConnection()->fetchPairs($select)) {
-                foreach ($this as $item) {
-                    if (!isset($result[$item->getData('identifier')])) {
-                        continue;
-                    }
-                }
-            }
+        if ($post instanceof Fontis_Blog_Model_Post) {
+            $post = (int) $post->getId();
         }
-
-        parent::_afterLoad();
-    }
-
-    public function addCatFilter($catId)
-    {
-        if (!Mage::app()->isSingleStoreMode()) {
-            $this->getSelect()->join(
-                array('cat_table' => $this->getTable('post_cat')),
-                'main_table.post_id = cat_table.post_id',
-                array()
-            )
-            ->where('cat_table.cat_id = ?', $catId);
-
-            return $this;
-        }
-        return $this;
-    }
-
-    public function addStoreFilter($store)
-    {
-        if (!Mage::app()->isSingleStoreMode()) {
-            if ($store instanceof Mage_Core_Model_Store) {
-                $store = array($store->getId());
-            }
-
-            $this->getSelect()->join(
-                array('store_table' => $this->getTable('cat_store')),
-                'main_table.cat_id = store_table.cat_id',
-                array()
-            )
-            ->where('store_table.store_id in (?)', array(0, $store));
-
-            return $this;
-        }
-        return $this;
-    }
-
-    public function addPostFilter($postId)
-    {
         $this->getSelect()->join(
-            array('cat_table' => $this->getTable('post_cat')),
-            'main_table.cat_id = cat_table.cat_id',
+            array("cat_table" => $this->getTable("blog/post_cat")),
+            "main_table.cat_id = cat_table.cat_id",
             array()
-        )
-        ->where('cat_table.post_id = ?', $postId);
+        );
+
+        if (is_array($post)) {
+            $this->getSelect()->where("cat_table.post_id IN (?)", $post);
+        } else {
+            $this->getSelect()->where("cat_table.post_id = ?", $post);
+        }
 
         return $this;
+    }
+
+    /**
+     * @param Fontis_Blog_Model_Blog|int|int[] $blog
+     * @return Fontis_Blog_Model_Cat[]|Fontis_Blog_Model_Mysql4_Cat_Collection
+     */
+    public function addBlogFilter($blog)
+    {
+        if ($blog instanceof Fontis_Blog_Model_Blog) {
+            $blog = (int) $blog->getId();
+        }
+        if (!$blog) {
+            return $this;
+        }
+
+        if (is_array($blog)) {
+            $this->getSelect()->where("main_table.blog_id IN (?)", $blog);
+        } else {
+            $this->getSelect()->where("main_table.blog_id = ?", $blog);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $idField
+     * @return array
+     */
+    public function toOptionArray($idField = "identifier")
+    {
+        return $this->_toOptionArray($idField, "title");
     }
 }

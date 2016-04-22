@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Fontis Blog Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * Parts of this software are derived from code originally developed by
+ * Robert Chambers <magento@robertchambers.co.uk>
+ * and released as "Lazzymonk's Blog" 0.5.8 in 2009.
+ *
+ * @category   Fontis
+ * @package    Fontis_Blog
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<customgrid>
+    <grid_types>
+        <fontis_blog_posts model="blog/customGrid_grid_type_posts" module="blog">
+            <name>Blog Posts</name>
+            <sort_order>70000</sort_order>
+            <custom_columns>
+                <categories model="blog/customGrid_custom_column_post_categories" module="blog">
+                    <name>Categories</name>
+                    <description>Displays for each post all the categories it's associated to</description>
+                    <warning>Sorting is based on a csv string of category IDs</warning>
+                    <allow_customization>1</allow_customization>
+                </categories>
+                <tags model="blog/customGrid_custom_column_post_tags" module="blog">
+                    <name>Tags</name>
+                    <description>Displays for each post all the tags it's associated to</description>
+                    <warning>Sorting is based on a csv string of tag IDs</warning>
+                    <allow_customization>1</allow_customization>
+                </tags>
+            </custom_columns>
+        </fontis_blog_posts>
+    </grid_types>
+</customgrid>

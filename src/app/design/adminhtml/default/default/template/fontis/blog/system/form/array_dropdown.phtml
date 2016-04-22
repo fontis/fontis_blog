@@ -1,0 +1,155 @@
+<?php
+/**
+ * Fontis Blog Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * Parts of this software are derived from code originally developed by
+ * Robert Chambers <magento@robertchambers.co.uk>
+ * and released as "Lazzymonk's Blog" 0.5.8 in 2009.
+ *
+ * @category   Fontis
+ * @package    Fontis_Blog
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+
+<?php /** @var $this Fontis_Blog_Block_Form_ArrayInputRenderer */ ?>
+
+<?php
+$htmlId = $this->getHtmlId() ? $this->getHtmlId() : '_' . uniqid();
+?>
+
+<div class="grid" id="grid<?php echo $htmlId; ?>">
+    <table cellpadding="0" cellspacing="0" class="border">
+        <tbody>
+
+            <tr class="headings" id="headings<?php echo $htmlId; ?>">
+            <?php foreach ($this->_columns as $columnName => $column): ?>
+                <th><?php echo $column['label']; ?></th>
+            <?php endforeach; ?>
+                <th></th>
+            </tr>
+
+            <tr id="addRow<?php echo $htmlId; ?>">
+                <td colspan="<?php echo count($this->_columns); ?>"></td>
+                <td>
+                    <button class="scalable add" type="button" id="addToEndBtn<?php echo $htmlId; ?>">
+                        <span><?php echo $this->_addButtonLabel; ?></span>
+                    </button>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+    <?php foreach ($this->_columns as $columnName => $column): ?>
+        <?php echo $this->_renderEmptyInput($column); ?>
+    <?php endforeach; ?>
+</div>
+<div id="empty<?php echo $htmlId; ?>">
+    <button class="scalable add" type="button" id="emptyAddBtn<?php echo $htmlId; ?>">
+       <span><?php echo $this->_addButtonLabel; ?></span>
+    </button>
+</div>
+
+<script type="text/javascript">
+// create row creator
+var arrayRow<?php echo $htmlId; ?> = {
+    // define row prototypeJS template
+    template : new Template(
+        '<tr id="#{_id}">'
+<?php foreach ($this->_columns as $columnName => $column):?>
+            +'<td class="#{_id}-<?php echo $columnName?>">'
+                +'<?php echo $this->_renderCellTemplate($column); ?>'
+            +'</td>'
+<?php endforeach; ?>
+            +'<td><button onclick="arrayRow<?php echo $htmlId; ?>.del(\'#{_id}\')" class="scalable delete" type="button"><span><?php echo $this->_removeButtonLabel; ?></span></button></td>'
+        +'</tr>'
+    ),
+
+    rowsCount : 0,
+
+    add: function(templateData, insertAfterId) {
+        // generate default template data
+        if ('' == templateData) {
+            var d = new Date();
+            var templateData = {
+<?php foreach ($this->_columns as $columnName => $column): ?>
+                <?php echo $columnName; ?> : '',
+<?php endforeach; ?>
+                _id : '_' + d.getTime() + '_' + d.getMilliseconds()
+            };
+        }
+
+        if ('' == insertAfterId) {
+            // insert before last row
+            new Insertion.Before(
+                $('addRow<?php echo $htmlId; ?>'),
+                this.template.evaluate(templateData)
+            );
+        } else {
+            // insert after specified row
+            new Insertion.After(
+                $(insertAfterId),
+                this.template.evaluate(templateData)
+            );
+        }
+        // set the selected drop-down list item
+<?php foreach ($this->_columns as $columnName => $column): ?>
+        var options = $$('td.' + templateData._id + '-' + '<?php echo $columnName; ?>' + ' option');
+        for (var index = 0; index < options.length; ++index) {
+            var option = options[index];
+            if (option.getAttribute('value') == templateData.<?php echo $columnName; ?>) {
+                option.selected = true;
+            }
+        }
+<?php endforeach; ?>
+
+        this.rowsCount += 1;
+    },
+
+    del: function(rowId) {
+        $(rowId).remove();
+        this.rowsCount -= 1;
+        if (0 == this.rowsCount) {
+            this.showButtonOnly();
+        }
+    },
+
+    showButtonOnly: function() {
+        $('grid<?php echo $htmlId; ?>').hide();
+        $('empty<?php echo $htmlId; ?>').show();
+    }
+}
+
+// bind add action to "Add" button in last row
+Event.observe('addToEndBtn<?php echo $htmlId; ?>', 'click', arrayRow<?php echo $htmlId; ?>.add.bind(arrayRow<?php echo $htmlId; ?>, '', ''));
+
+// add existing rows
+<?php
+$_addAfterId = "headings{$htmlId}";
+foreach ($this->getArrayRows() as $rowId => $row) {
+    echo "arrayRow{$htmlId}.add(" . $row->toJson() . ", '{$_addAfterId}');\n";
+    $_addAfterId = $rowId;
+}
+?>
+
+// initialize standalone button
+$('empty<?php echo $htmlId; ?>').hide();
+Event.observe('emptyAddBtn<?php echo $htmlId ?>', 'click', function () {
+    $('grid<?php echo $htmlId; ?>').show();
+    $('empty<?php echo $htmlId; ?>').hide();
+    arrayRow<?php echo $htmlId; ?>.add('', '');
+});
+
+// if no rows, hide grid and show button only
+<?php if (!$this->getArrayRows()):?>
+arrayRow<?php echo $htmlId; ?>.showButtonOnly();
+<?php endif;?>
+</script>

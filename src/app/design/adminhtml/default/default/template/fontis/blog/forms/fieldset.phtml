@@ -1,0 +1,71 @@
+<?php
+/**
+ * Fontis Blog Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * Parts of this software are derived from code originally developed by
+ * Robert Chambers <magento@robertchambers.co.uk>
+ * and released as "Lazzymonk's Blog" 0.5.8 in 2009.
+ *
+ * @category   Fontis
+ * @package    Fontis_Blog
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+
+<?php /** @var $this Mage_Adminhtml_Block_Widget_Form_Renderer_Fieldset */ ?>
+
+<?php
+/** @var $element Varien_Data_Form_Element_Fieldset */
+$element = $this->getElement();
+$elementHtmlId = $element->getHtmlId();
+?>
+
+<?php if ($element->getFieldsetContainerId()): ?>
+<div id="<?php echo $element->getFieldsetContainerId(); ?>">
+<?php endif; ?>
+
+<?php if ($element->getLegend()): ?>
+<div class="entry-edit-head collapseable">
+    <?php if ($element->getNoContainer()): ?>
+    <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $element->getLegend() ?></h4>
+    <?php else: ?>
+    <a href="#" id="<?php echo $elementHtmlId; ?>-head" onclick="Fieldset.toggleCollapse('<?php echo $elementHtmlId; ?>'); return false;"><?php echo $element->getLegend() ?></a>
+    <?php endif; ?>
+    <div class="form-buttons"><?php echo $element->getHeaderBar(); ?></div>
+</div>
+<?php endif; ?>
+
+<?php if (!$element->getNoContainer()): ?>
+    <div class="fieldset <?php echo $element->getClass(); ?>" id="<?php echo $element->getHtmlId(); ?>">
+<?php endif; ?>
+    <div class="hor-scroll">
+        <?php if ($element->getComment()): ?>
+            <p class="comment"><?php echo $this->escapeHtml($element->getComment()); ?></p>
+        <?php endif; ?>
+        <?php if ($element->hasHtmlContent()): ?>
+            <?php echo $element->getHtmlContent(); ?>
+        <?php else: ?>
+        <table cellspacing="0" class="<?php echo $element->hasTableClass() ? $element->getTableClass() : 'form-list'?>">
+            <tbody>
+                <?php echo $element->getChildrenHtml(); ?>
+            </tbody>
+        </table>
+        <?php endif; ?>
+    </div>
+    <?php echo $element->getSubFieldsetHtml(); ?>
+<?php if (!$element->getNoContainer()): ?>
+    </div>
+    <script type="text/javascript">Fieldset.applyCollapse('<?php echo $elementHtmlId; ?>');</script>
+<?php endif; ?>
+
+<?php if ($element->getFieldsetContainerId()): ?>
+</div>
+<?php endif; ?>

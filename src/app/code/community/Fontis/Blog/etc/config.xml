@@ -8,7 +8,7 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * Parts of this software are derived from code originally developed by
  * Robert Chambers <magento@robertchambers.co.uk>
@@ -16,15 +16,16 @@
  *
  * @category   Fontis
  * @package    Fontis_Blog
- * @copyright  Copyright (c) 2013 Fontis Pty. Ltd. (http://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 
 <config>
     <modules>
         <Fontis_Blog>
-            <version>1.1.2</version>
+            <version>2.0.0</version>
+            <url_key>blog</url_key>
         </Fontis_Blog>
     </modules>
     <admin>
@@ -32,7 +33,7 @@
             <adminhtml>
                 <args>
                     <modules>
-                        <Fontis_Blog before="Mage_Adminhtml">Fontis_Blog_Manage</Fontis_Blog>
+                        <Fontis_Blog after="Mage_Adminhtml">Fontis_Blog_Manage</Fontis_Blog>
                     </modules>
                 </args>
             </adminhtml>
@@ -41,18 +42,17 @@
     <frontend>
         <routers>
             <blog>
-                <use>standard</use>
+                <use>fontis</use>
                 <args>
                     <module>Fontis_Blog</module>
-                    <frontName>blog</frontName>
                 </args>
             </blog>
         </routers>
         <layout>
             <updates>
-                <blog>
+                <fontis_blog module="Fontis_Blog">
                     <file>fontis/blog.xml</file>
-                </blog>
+                </fontis_blog>
             </updates>
         </layout>
         <translate>
@@ -68,7 +68,46 @@
             <pages>
                 <fontis_blog>blog</fontis_blog>
             </pages>
+            <models>
+                <fontis_blog>blog/blog</fontis_blog>
+                <fontis_blog_post>blog/post</fontis_blog_post>
+                <fontis_blog_cat>blog/cat</fontis_blog_cat>
+                <fontis_blog_tag>blog/tag</fontis_blog_tag>
+                <fontis_blog_comment>blog/comment</fontis_blog_comment>
+            </models>
+            <model_registry>
+                <current_blog>
+                    <registry_key>current_blog_object</registry_key>
+                    <model_classname>blog/blog</model_classname>
+                </current_blog>
+                <current_blog_post>
+                    <registry_key>current_blog_post</registry_key>
+                    <model_classname>blog/post</model_classname>
+                </current_blog_post>
+                <current_blog_category>
+                    <registry_key>current_blog_category</registry_key>
+                    <model_classname>blog/cat</model_classname>
+                </current_blog_category>
+                <current_blog_tag>
+                    <registry_key>current_blog_tag</registry_key>
+                    <model_classname>blog/tag</model_classname>
+                </current_blog_tag>
+                <current_blog_author>
+                    <registry_key>current_blog_author</registry_key>
+                    <model_classname>blog/author</model_classname>
+                </current_blog_author>
+            </model_registry>
         </cache>
+        <events>
+            <page_block_html_topmenu_gethtml_before>
+                <observers>
+                    <fontis_blog_setup_menu>
+                        <class>blog/observer_topmenu</class>
+                        <method>prepareMenu</method>
+                    </fontis_blog_setup_menu>
+                </observers>
+            </page_block_html_topmenu_gethtml_before>
+        </events>
     </frontend>
 
     <adminhtml>
@@ -81,95 +120,21 @@
                 </Fontis_Blog>
             </modules>
         </translate>
-        <menu>
-            <blog module="blog">
-                <title>Blog</title>
-                <sort_order>71</sort_order>
-                <children>
-                    <newpost module="blog">
-                        <title>New Post</title>
-                        <sort_order>0</sort_order>
-                        <action>adminhtml/blog_blog/new</action>
-                    </newpost>
-                    <posts module="blog">
-                        <title>Manage Posts</title>
-                        <sort_order>1</sort_order>
-                        <action>adminhtml/blog_blog/index</action>
-                    </posts>
-                    <comment module="blog">
-                        <title>Manage Comments</title>
-                        <sort_order>2</sort_order>
-                        <action>adminhtml/blog_comment/index</action>
-                    </comment>
-                    <cat module="blog">
-                        <title>Manage Categories</title>
-                        <sort_order>3</sort_order>
-                        <action>adminhtml/blog_cat/index</action>
-                    </cat>
-                    <settings translate="title" module="blog">
-                        <title>Settings</title>
-                        <sort_order>4</sort_order>
-                        <action>adminhtml/system_config/edit/section/fontis_blog</action>
-                    </settings>
-                </children>
-            </blog>
-        </menu>
-        <acl>
-            <resources>
-                <all>
-                    <title>Allow Everything</title>
-                </all>
-                <admin>
-                    <children>
-                        <blog>
-                            <title>Blog</title>
-                            <sort_order>70</sort_order>
-                            <children>
-                                <newpost>
-                                    <title>New Post</title>
-                                    <sort_order>0</sort_order>
-                                </newpost>
-                                <posts>
-                                    <title>Manage Posts</title>
-                                    <sort_order>1</sort_order>
-                                </posts>
-                                <comment>
-                                    <title>Manage Comments</title>
-                                    <sort_order>2</sort_order>
-                                </comment>
-                                <cat>
-                                    <title>Manage Categories</title>
-                                    <sort_order>3</sort_order>
-                                </cat>
-                                <settings>
-                                    <title>Settings</title>
-                                    <sort_order>4</sort_order>
-                                </settings>
-                            </children>
-                        </blog>
-                        <system>
-                            <children>
-                                <config>
-                                    <children>
-                                        <fontis_blog>
-                                            <title>Fontis Blog Section</title>
-                                        </fontis_blog>
-                                    </children>
-                                </config>
-                            </children>
-                        </system>
-                    </children>
-                </admin>
-            </resources>
-        </acl>
         <layout>
             <updates>
-                <blog>
+                <fontis_blog module="Fontis_Blog">
                     <file>fontis/blog.xml</file>
-                </blog>
+                </fontis_blog>
             </updates>
         </layout>
+        <global_search>
+            <blog_posts>
+                <class>blog/adminhtml_search_posts</class>
+                <acl>blog/posts</acl>
+            </blog_posts>
+        </global_search>
     </adminhtml>
+
     <global>
         <models>
             <blog>
@@ -182,8 +147,14 @@
                     <blog>
                         <table>fontis_blog</table>
                     </blog>
+                    <config>
+                        <table>fontis_blog_config</table>
+                    </config>
+                    <store>
+                        <table>fontis_blog_store</table>
+                    </store>
                     <post>
-                        <table>fontis_blog</table>
+                        <table>fontis_blog_post</table>
                     </post>
                     <comment>
                         <table>fontis_blog_comment</table>
@@ -194,16 +165,35 @@
                     <post_cat>
                         <table>fontis_blog_post_cat</table>
                     </post_cat>
-                    <store>
+                    <tag>
+                        <table>fontis_blog_tag</table>
+                    </tag>
+                    <post_tag>
+                        <table>fontis_blog_post_tag</table>
+                    </post_tag>
+                    <author>
+                        <table>fontis_blog_author</table>
+                    </author>
+                    <!-- legacy table names -->
+                    <legacy_blog>
+                        <table>fontis_blog</table>
+                    </legacy_blog>
+                    <legacy_store>
                         <table>fontis_blog_store</table>
-                    </store>
-                    <cat_store>
+                    </legacy_store>
+                    <legacy_post_store>
+                        <table>fontis_blog_post_store</table>
+                    </legacy_post_store>
+                    <legacy_cat_store>
                         <table>fontis_blog_cat_store</table>
-                    </cat_store>
+                    </legacy_cat_store>
                 </entities>
             </blog_mysql4>
             <sitemap>
                 <rewrite>
+                    <!-- This rewrite will be overridden by the Fontis_Sitemap extension.
+                         The code is left here because it will still function correctly if the Fontis_Sitemap extension
+                         isn't installed. -->
                     <sitemap>Fontis_Blog_Model_Sitemap</sitemap>
                 </rewrite>
             </sitemap>
@@ -239,6 +229,7 @@
             </blog>
         </helpers>
         <events>
+            <!-- This must be in global, as the frontend event space has not yet been loaded. -->
             <controller_front_init_routers>
                 <observers>
                     <blog>
@@ -248,6 +239,64 @@
                     </blog>
                 </observers>
             </controller_front_init_routers>
+
+            <!-- Algolia Integration -->
+            <fontis_algolia_cms_entity_index_before>
+                <observers>
+                    <blog_algolia_index>
+                        <class>blog/observer_algolia</class>
+                        <method>getAllBlogContent</method>
+                    </blog_algolia_index>
+                </observers>
+            </fontis_algolia_cms_entity_index_before>
+            <blog_post_save_commit_after>
+                <observers>
+                    <blog_algolia_post_reindex>
+                        <class>blog/observer_algolia</class>
+                        <method>reindexPost</method>
+                    </blog_algolia_post_reindex>
+                </observers>
+            </blog_post_save_commit_after>
+            <blog_post_delete_commit_after>
+                <observers>
+                    <blog_algolia_post_delete>
+                        <class>blog/observer_algolia</class>
+                        <method>deletePost</method>
+                    </blog_algolia_post_delete>
+                </observers>
+            </blog_post_delete_commit_after>
+            <blog_blog_save_commit_after>
+                <observers>
+                    <blog_algolia_post_reindex>
+                        <class>blog/observer_algolia</class>
+                        <method>reindexBlog</method>
+                    </blog_algolia_post_reindex>
+                </observers>
+            </blog_blog_save_commit_after>
+            <blog_blog_delete_commit_after>
+                <observers>
+                    <blog_algolia_blog_delete>
+                        <class>blog/observer_algolia</class>
+                        <method>deleteBlog</method>
+                    </blog_algolia_blog_delete>
+                </observers>
+            </blog_blog_delete_commit_after>
+            <blog_cat_save_commit_after>
+                <observers>
+                    <blog_algolia_cat_reindex>
+                        <class>blog/observer_algolia</class>
+                        <method>reindexCat</method>
+                    </blog_algolia_cat_reindex>
+                </observers>
+            </blog_cat_save_commit_after>
+            <blog_cat_delete_commit_after>
+                <observers>
+                    <blog_algolia_cat_delete>
+                        <class>blog/observer_algolia</class>
+                        <method>deleteCat</method>
+                    </blog_algolia_cat_delete>
+                </observers>
+            </blog_cat_delete_commit_after>
         </events>
         <template>
             <email>
@@ -258,29 +307,139 @@
                 </blog_comments_email_template>
             </email>
         </template>
+        <canonical_helpers>
+            <blog_home_page>
+                <!-- Necessary to ensure page 1 is normalised -->
+                <sort_order>20</sort_order>
+                <registry>fontis_blog_index</registry>
+                <callback>
+                    <object>blog/provider</object>
+                    <function>getBlogUrlPath</function>
+                </callback>
+            </blog_home_page>
+            <blog_cat_page>
+                <!-- Necessary to ensure page 1 is normalised -->
+                <sort_order>20</sort_order>
+                <registry>current_blog_category</registry>
+                <callback>
+                    <object>blog/provider</object>
+                    <function>getBlogCatUrlPath</function>
+                </callback>
+            </blog_cat_page>
+        </canonical_helpers>
+        <fontis_richsnippets>
+            <blog_home_page>
+                <registry>fontis_blog_index</registry>
+                <callback>
+                    <object>blog/provider_richSnippets</object>
+                    <function>getBlogMetadata</function>
+                </callback>
+            </blog_home_page>
+            <blog_cat_page>
+                <registry>current_blog_category</registry>
+                <callback>
+                    <object>blog/provider_richSnippets</object>
+                    <function>getBlogCatMetadata</function>
+                </callback>
+            </blog_cat_page>
+            <blog_post_page>
+                <registry>current_blog_post</registry>
+                <callback>
+                    <object>blog/provider_richSnippets</object>
+                    <function>getBlogPostMetadata</function>
+                </callback>
+            </blog_post_page>
+        </fontis_richsnippets>
+        <opengraph_helpers>
+            <blog_home_page>
+                <registry>fontis_blog_index</registry>
+                <callback>
+                    <object>blog/provider_opengraph</object>
+                    <function>getBlogMetadata</function>
+                </callback>
+            </blog_home_page>
+            <blog_cat_page>
+                <registry>current_blog_category</registry>
+                <callback>
+                    <object>blog/provider_opengraph</object>
+                    <function>getBlogCatMetadata</function>
+                </callback>
+            </blog_cat_page>
+            <blog_post_page>
+                <registry>current_blog_post</registry>
+                <callback>
+                    <object>blog/provider_opengraph</object>
+                    <function>getBlogPostMetadata</function>
+                </callback>
+            </blog_post_page>
+        </opengraph_helpers>
+        <cms_directives>
+            <blog>
+                <helper>blog/provider</helper>
+                <function>getBlogUrl</function>
+            </blog>
+            <blogpost>
+                <helper>blog/provider</helper>
+                <function>getBlogPostUrl</function>
+            </blogpost>
+            <blogcat>
+                <helper>blog/provider</helper>
+                <function>getBlogCatUrl</function>
+            </blogcat>
+            <blogtag>
+                <helper>blog/provider</helper>
+                <function>getBlogTagUrl</function>
+            </blogtag>
+            <blogarchv>
+                <helper>blog/provider</helper>
+                <function>getBlogArchiveUrl</function>
+            </blogarchv>
+            <blogauthor>
+                <helper>blog/provider</helper>
+                <function>getBlogAuthorUrl</function>
+            </blogauthor>
+        </cms_directives>
+        <fontis_sitemap>
+            <sitemaps>
+                <blog>
+                    <class>blog/sitemap_collection</class>
+                </blog>
+            </sitemaps>
+        </fontis_sitemap>
     </global>
 
     <default>
         <fontis_blog>
             <blog>
-                <enabled>1</enabled>
                 <title>Blog</title>
-                <route>blog</route>
                 <blogcrumbs>1</blogcrumbs>
-                <readmore>500</readmore>
-                <usesummary>1</usesummary>
                 <dateformat>long</dateformat>
                 <layout>page/2columns-right.phtml</layout>
                 <wysiwyg_post>enabled</wysiwyg_post>
-                <wysiwyg_summary>hidden</wysiwyg_summary>
+                <wysiwyg_summary>enabled</wysiwyg_summary>
             </blog>
+            <routing>
+                <cat>cat</cat>
+                <tag>tag</tag>
+                <author>author</author>
+            </routing>
             <menu>
                 <left>0</left>
                 <right>1</right>
                 <recent>5</recent>
+                <tags>1</tags>
                 <top>0</top>
                 <footer>0</footer>
+                <primary>1</primary>
             </menu>
+            <lists>
+                <readmore>500</readmore>
+                <usesummary>1</usesummary>
+                <perpage>5</perpage>
+            </lists>
+            <posts>
+                <title_format>[blog:title] - [post:title]</title_format>
+            </posts>
             <comments>
                 <enabled>1</enabled>
                 <login>0</login>
@@ -297,17 +456,32 @@
                 <order>asc</order>
                 <showcount>1</showcount>
             </archives>
+            <authors>
+                <enabled>0</enabled>
+                <label>Authors</label>
+                <heading_format>[author:name]</heading_format>
+            </authors>
             <rss>
                 <enabled>1</enabled>
+                <visible>2</visible>
                 <image>images/logo.gif</image>
                 <usesummary>0</usesummary>
+                <showauthor>0</showauthor>
             </rss>
-        </fontis_blog>
-        <sitemap>
-            <blog>
+            <sitemap>
+                <priority_list>0.5</priority_list>
                 <priority_post>0.75</priority_post>
-                <priority_cat>0.5</priority_cat>
-            </blog>
-        </sitemap>
+            </sitemap>
+            <opengraph>
+                <post_default_image>image</post_default_image>
+            </opengraph>
+            <search>
+                <include_in_search>0</include_in_search>
+                <attributes_to_index>title,post_content,summary_content,identifier,meta_keywords,meta_description,image,small_image</attributes_to_index>
+            </search>
+            <advanced>
+                <add_default_layout_handles>1</add_default_layout_handles>
+            </advanced>
+        </fontis_blog>
     </default>
 </config>

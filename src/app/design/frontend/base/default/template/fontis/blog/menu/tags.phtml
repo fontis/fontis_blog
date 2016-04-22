@@ -1,0 +1,37 @@
+<?php
+/**
+ * Fontis Blog Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * Parts of this software are derived from code originally developed by
+ * Robert Chambers <magento@robertchambers.co.uk>
+ * and released as "Lazzymonk's Blog" 0.5.8 in 2009.
+ *
+ * @category   Fontis
+ * @package    Fontis_Blog
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+
+<?php /** @var $this Fontis_Blog_Block_Menu */ ?>
+
+<?php $tagLimit = $this->getTagLimit(); ?>
+<?php if ($tags = $this->getTags($tagLimit)): ?>
+<?php $helper = Mage::helper("blog"); ?>
+    <h5><?php echo $this->getBlog()->getTagLabel(); ?></h5>
+    <ul>
+    <?php foreach ($tags as $tag): ?>
+        <li><a href="<?php echo $tag->getTagUrl(); ?>"><?php echo $tag->getName(); ?></a></li>
+    <?php endforeach; ?>
+    </ul>
+    <?php if (is_numeric($tagLimit) && $tagLimit > 0): ?>
+    <a href="<?php echo $this->getBlog()->getTagIndexUrl(); ?>"><?php echo $this->__("See All"); ?></a>
+    <?php endif; ?>
+<?php endif; ?>
